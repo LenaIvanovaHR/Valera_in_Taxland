@@ -1,1 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Валера в Стране Налогов</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            height: 100vh;
+            max-height: 720px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            transition: background-image 0.5s ease-in-out;
+        }
+        #character-sprite {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 60%;
+            display: none;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+        }
+        #dialogue-box {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7));
+            border-top: 3px solid #ff8c00;
+            box-sizing: border-box;
+            padding: 20px 40px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        #speaker {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c00;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+        #text {
+            font-size: 20px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            margin: 0;
+        }
+        #hint {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 14px;
+            color: #aaa;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        #choices {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 60%;
+            display: none;
+        }
+        .choice-btn {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #ff8c00;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .choice-btn:hover {
+            background: #ff8c00;
+            color: black;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
 
+<div id="game-container">
+    <img id="character-sprite" src="" alt="Персонаж">
+    
+    <div id="choices"></div>
+
+    <div id="dialogue-box" onclick="nextSlide()">
+        <div id="speaker">Валера</div>
+        <p id="text">Хм, что это ещё за файл? Я такой не сохранял...</p>
+        <div id="hint">Нажмите, чтобы продолжить...</div>
+    </div>
+</div>
+
+<script>
+    // === НАСТРОЙКИ ИГРЫ ===
+    // Здесь мы описываем сюжет. Просто добавляй новые объекты в массив!
+    const story = [
+        {
+            bg: "images/bg_office.png",
+            speaker: "Валера",
+            text: "Хм, что это ещё за файл? Я такой не сохранял...",
+            sprite: null // Нет персонажа
+        },
+        {
+            bg: "images/bg_documents.png",
+            speaker: "Голос сверху",
+            text: "Падать вечно нельзя, дружок. Рано или поздно долетишь до сути.",
+            sprite: null
+        },
+        {
+            bg: "images/bg_documents.png",
+            speaker: "Рыжий Кот",
+            text: "Добро пожаловать в Страну Налогов, Валера. Тут всё как у вас, только выгоднее — если знать, куда смотреть.",
+            sprite: "images/cat_smile.png" // Показываем кота
+        },
+        // === ВЫБОР ===
+        {
+            isChoice: true,
+            choices: [
+                { text: "А зачем мне вообще это надо?", next: 4 },
+                { text: "Хорошо, показывай дорогу", next: 5 }
+            ]
+        },
+        {
+            bg: "images/bg_documents.png",
+            speaker: "Рыжий Кот",
+            text: "Неплохо — не значит по максимуму. Тысячи рублей просто лежат там, где ты их не забираешь.",
+            sprite: "images/cat_smile.png",
+            next: 2 // Возврат к предыдущему слайду (упрощенно)
+        },
+        {
+            bg: "images/bg_forest.png",
+            speaker: "Рыжий Кот",
+            text: "Тогда за мной. Первая остановка — Родительский лес.",
+            sprite: "images/cat_full.png"
+        }
+    ];
+
+    let currentIndex = 0;
+    const bgElement = document.getElementById('game-container');
+    const speakerElement = document.getElementById('speaker');
+    const textElement = document.getElementById('text');
+    const spriteElement = document.getElementById('character-sprite');
+    const choicesElement = document.getElementById('choices');
+    const dialogueBox = document.getElementById('dialogue-box');
+
+    function updateScene() {
+        const scene = story[currentIndex];
+        
+        // Если это слайд с выбором
+        if (scene.isChoice) {
+            dialogueBox.style.display = 'none';
+            choicesElement.style.display = 'flex';
+            choicesElement.innerHTML = '';
+            
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    currentIndex = choice.next;
+                    choicesElement.style.display = 'none';
+                    dialogueBox.style.display = 'flex';
+                    updateScene();
+                };
+                choicesElement.appendChild(btn);
+            });
+            return;
+        }
+
+        // Обычный слайд
+        dialogueBox.style.display = 'flex';
+        
+        // Меняем фон
+        if (scene.bg) {
+            bgElement.style.backgroundImage = `url('${scene.bg}')`;
+        }
+        
+        // Меняем текст и говорящего
+        speakerElement.innerText = scene.speaker;
+        textElement.innerText = scene.text;
+        
+        // Показываем/скрываем спрайт
+        if (scene.sprite) {
+            spriteElement.src = scene.sprite;
+            spriteElement.style.display = 'block';
+        } else {
+            spriteElement.style.display = 'none';
+        }
+    }
+
+    function nextSlide() {
+        // Если это слайд с выбором, клик по диалоговому окну ничего не делает
+        if (story[currentIndex].isChoice) return;
+
+        // Если есть ссылка на следующий слайд, идем туда
+        if (story[currentIndex].next !== undefined) {
+            currentIndex = story[currentIndex].next;
+        } else {
+            // Иначе просто идем по порядку
+            currentIndex++;
+        }
+
+        // Если история закончилась
+        if (currentIndex >= story.length) {
+            textElement.innerText = "Конец демо-версии. Спасибо за игру!";
+            speakerElement.innerText = "Система";
+            document.getElementById('hint').style.display = 'none';
+            return;
+        }
+
+        updateScene();
+    }
+
+    // Запуск игры
+    updateScene();
+</script>
+
+</body>
+</html>
