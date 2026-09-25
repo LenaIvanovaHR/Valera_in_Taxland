@@ -360,3 +360,144 @@
         "block4_scene3": {
             bg: "images/bg_social_forest.png", speaker: "Рыжий Кот",
             text: "Здесь всё, на что ты обычно тратишься сам. Учёба, лечение, фитнес — общий лимит вычета 150 000 рублей в год. А вот обучение детей считается отдельно — до 110 000 рублей на каждого ребёнка. Дорогостоящее лечение вообще не ограничено лимитом.", sprite: "images/cat_full.png",
+            next: "block4_choice3"
+        },
+        "block4_choice3": {
+            speaker: "Выбор", text: "Валера потратил: 40 000 ₽ на обучение, 90 000 ₽ на фитнес, и 80 000 ₽ на обучение сына. Сколько войдёт в общий лимит?",
+            choices: [
+                { text: "Все 210 000 войдут в общий лимит", next: "block4_ch3_A" },
+                { text: "Всё войдёт в лимит на ребёнка", next: "block4_ch3_C" },
+                { text: "130 000 — в общий лимит, а 80 000 за сына — отдельно", next: "block4_ch3_B", coins: 30 }
+            ]
+        },
+        "block4_ch3_A": { speaker: "Рыжий Кот", text: "Не совсем. Обучение и лечение за себя — это один котёл, а за детей — отдельный.", next: "block4_choice3" },
+        "block4_ch3_C": { speaker: "Рыжий Кот", text: "Не совсем. Обучение и лечение за себя — это один котёл, а за детей — отдельный.", next: "block4_choice3" },
+        "block4_ch3_B": { speaker: "Гусеница Bugatti", text: "Прекрасно! Именно так — траты Валеры на себя (130 000) укладываются в общий лимит 150 000, а 80 000 за сына — отдельно.", next: "block4_scene4" },
+
+        "block4_scene4": {
+            bg: "images/bg_archive.png", speaker: "Рыжий Кот",
+            text: "Раньше здесь был хаос — договоры, чеки, лицензии для каждого вычета отдельно. Теперь порядок: одна справка на всё. Но это только для трат после 1 января 2024 года.", sprite: "images/cat_full.png",
+            next: "block4_choice4"
+        },
+        "block4_choice4": {
+            speaker: "Выбор", text: "Что нужно сделать, чтобы получить вычет в упрощённом порядке?",
+            choices: [
+                { text: "Собрать справки, чеки и лично отнести их в налоговую", next: "block4_ch4_A" },
+                { text: "Ничего, вычет придёт сам собой без всяких действий", next: "block4_ch4_C" },
+                { text: "Дождаться предзаполненного заявления в Личном кабинете и просто подписать его", next: "block4_ch4_B", coins: 25 }
+            ]
+        },
+        "block4_ch4_A": { speaker: "Рыжий Кот", text: "Это как раз то, от чего мы избавились. Не в этот раз.", next: "block4_choice4" },
+        "block4_ch4_C": { speaker: "Гусеница Bugatti", text: "Подписать заявление всё же придётся — само оно не подтвердится.", next: "block4_choice4" },
+        "block4_ch4_B": { speaker: "Рыжий Кот", text: "Организация сама передаст данные — с твоего согласия. В марте следующего года жди сообщение в Личном кабинете.", next: "block4_scene5" },
+
+        "block4_scene5": {
+            bg: "images/bg_palace.png", speaker: "Рыжий Кот",
+            text: "Добро пожаловать в самое новое крыло Страны Налогов. С 2026 года здесь раздают кешбэк. Если в семье двое и более детей, и средний доход на человека ниже 1,5 прожиточного минимума — налог пересчитывается по ставке 6% вместо 13%.", sprite: "images/cat_full.png",
+            next: "block4_choice5"
+        },
+        "block4_choice5": {
+            speaker: "Выбор", text: "У Гены трое детей, доход 1 450 000 ₽, прожиточный минимум 17 733 ₽. Подходит ли Гена под кешбэк?",
+            choices: [
+                { text: "Не подходит, доход слишком большой", next: "block4_ch5_A" },
+                { text: "Невозможно посчитать без дополнительных данных", next: "block4_ch5_C" },
+                { text: "Подходит, доход ниже порога", next: "block4_ch5_B", coins: 30 }
+            ]
+        },
+        "block4_ch5_A": { speaker: "Рыжий Кот", text: "Кот качает головой, показывает лапой на цифры выше.", next: "block4_choice5" },
+        "block4_ch5_C": { speaker: "Рыжий Кот", text: "Кот качает головой, показывает лапой на цифры выше.", next: "block4_choice5" },
+        "block4_ch5_B": { speaker: "Гусеница Bugatti", text: "Верно! И сумма кешбэка — это разница между налогом по 13% и по 6% — то есть 101 500 ₽ в год!", next: "final" },
+
+        // ФИНАЛ
+        "final": {
+            bg: "images/bg_final.png", speaker: "Рыжий Кот",
+            text: "Ну что, Валера, готов открыть сундук? Помни: вычет сам не придёт, если ты сам не протянешь руку. Увидимся в другой раз!", sprite: "images/cat_smile.png",
+            next: "end_game"
+        },
+        "end_game": {
+            speaker: "Система", text: "Конец игры! Вы собрали " + state.coins + " монет любопытства. Спасибо за игру!",
+            next: null
+        }
+    };
+
+    // ==========================================
+    // ЛОГИКА ИГРЫ (JS)
+    // ==========================================
+    const bgElement = document.getElementById('game-container');
+    const speakerElement = document.getElementById('speaker');
+    const textElement = document.getElementById('text');
+    const spriteElement = document.getElementById('character-sprite');
+    const choicesElement = document.getElementById('choices');
+    const dialogueBox = document.getElementById('dialogue-box');
+    const coinDisplay = document.getElementById('coins-display');
+    const coinCount = document.getElementById('coin-count');
+
+    function updateScene() {
+        const scene = story[state.currentLabel];
+        if (!scene) {
+            console.error("Сцена не найдена: " + state.currentLabel);
+            return;
+        }
+
+        // Обновляем монеты
+        coinCount.innerText = state.coins;
+        if (state.coins > 0) coinDisplay.style.display = 'block';
+
+        // Если это слайд с выбором
+        if (scene.choices) {
+            dialogueBox.style.display = 'none';
+            choicesElement.style.display = 'flex';
+            choicesElement.innerHTML = '';
+            
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    if (choice.coins) state.coins += choice.coins;
+                    state.currentLabel = choice.next;
+                    choicesElement.style.display = 'none';
+                    dialogueBox.style.display = 'flex';
+                    updateScene();
+                };
+                choicesElement.appendChild(btn);
+            });
+            return;
+        }
+
+        // Обычный слайд
+        dialogueBox.style.display = 'flex';
+        
+        // Меняем фон
+        if (scene.bg) {
+            bgElement.style.backgroundImage = `url('${scene.bg}')`;
+        }
+        
+        // Меняем текст и говорящего
+        speakerElement.innerText = scene.speaker || "Система";
+        textElement.innerText = scene.text || "";
+        
+        // Показываем/скрываем спрайт
+        if (scene.sprite) {
+            spriteElement.src = scene.sprite;
+            spriteElement.style.display = 'block';
+        } else {
+            spriteElement.style.display = 'none';
+        }
+    }
+
+    function nextSlide() {
+        const scene = story[state.currentLabel];
+        if (scene.choices || !scene.next) return; // Если выбор или конец игры
+
+        state.currentLabel = scene.next;
+        updateScene();
+    }
+
+    // Запуск игры
+    updateScene();
+</script>
+
+</body>
+</html>
+```
