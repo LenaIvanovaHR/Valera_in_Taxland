@@ -1,2 +1,2 @@
-# Valera_in_Taxland
-Валера в Стране Налогов
+# Teploluxe_in_Taxland
+Teploluxe_in_Taxland
