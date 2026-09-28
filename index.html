@@ -1,825 +1,302 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEPLOLUXE • Финансовый & Налоговый Симулятор</title>
-    <!-- Подключение премиального шрифта Montserrat -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            /* Премиальная светлая палитра (Warm Luxe) */
-            --bg-main: #f7f5f0;          /* Мягкий молочно-бежевый фон */
-            --card-bg: #ffffff;          /* Белоснежные карточки */
-            --card-subtle: #f1ede6;      /* Вторичные блоки */
-            --border-color: #e2dbc9;     /* Тонкие бежевые границы */
-            
-            --text-primary: #2c2a29;     /* Глубокий графитовый (основной текст) */
-            --text-secondary: #706b65;   /* Приглушенный теплый серый */
-            
-            /* Благородные, не ядовитые акценты */
-            --accent-brand: #d95d39;     /* Элегантный терракотово-оранжевый (Теплолюкс) */
-            --accent-brand-light: #fbeee9;
-            --accent-green: #3a7d5c;     /* Приглушенный шалфейно-зеленый */
-            --accent-green-bg: #edf4ef;
-            --accent-red: #c04e4e;       /* Приглушенный припыленно-красный */
-            --accent-red-bg: #f9ecec;
-            --accent-gold: #c29243;      /* Мягкий золотистый */
-            --accent-gold-bg: #f8f3e9;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Налоговые вычеты — тренажёр • ГК «Теплолюкс»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1e21; --ink2:#26292d; --ink3:#33373c;
+  --grey:#d6d6d2; --grey2:#9a9c9e;
+  --beige:#ece3d3; --beige2:#f6f1e7;
+  --terra:#d95d39; --terra2:#b8472a;
+  --ok:#5f8f6b; --bad:#c2453a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;background:var(--ink);color:var(--beige);-webkit-font-smoothing:antialiased;line-height:1.5}
+.app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
 
-            --shadow-soft: 0 10px 30px rgba(44, 42, 41, 0.05);
-            --shadow-modal: 0 20px 50px rgba(44, 42, 41, 0.12);
-        }
+/* Sidebar */
+aside{background:var(--ink2);border-right:1px solid var(--ink3);padding:28px 24px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{background:var(--terra);color:#fff;font-weight:800;font-size:13px;letter-spacing:.14em;padding:8px 12px;border-radius:6px}
+.brand small{color:var(--grey2);font-size:12px;line-height:1.3}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--ink);border:1px solid var(--ink3);border-radius:12px;padding:12px 14px}
+.stat.wide{grid-column:span 2}
+.stat span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey2)}
+.stat b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat.wide b{color:var(--terra);font-size:26px}
+.steps{list-style:none;display:flex;flex-direction:column;gap:2px;overflow:auto;flex:1}
+.steps li{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--grey2);transition:.2s}
+.steps li i{font-style:normal;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink3);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.steps li.cur{background:var(--ink);color:var(--beige)}
+.steps li.cur i{border-color:var(--terra);color:var(--terra)}
+.steps li.ok i{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.bad i{background:var(--bad);border-color:var(--bad);color:#fff}
+.steps li.ok,.steps li.bad{color:var(--grey)}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+/* Main */
+main{padding:clamp(20px,4vw,56px);display:flex;flex-direction:column;justify-content:center;max-width:920px;width:100%;margin:0 auto}
+.bar{height:3px;background:var(--ink3);border-radius:3px;overflow:hidden;margin-bottom:32px}
+.bar div{height:100%;background:var(--terra);width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.kicker{display:flex;gap:10px;align-items:center;color:var(--terra);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.kicker em{font-style:normal;color:var(--grey2);font-weight:500;letter-spacing:.04em;text-transform:none}
+h1{font-size:clamp(26px,3.4vw,40px);line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-bottom:22px}
+.theory{background:var(--beige);color:var(--ink);border-radius:16px;padding:20px 24px;margin-bottom:22px;position:relative}
+.theory::before{content:"ТЕОРИЯ";position:absolute;top:-9px;left:20px;background:var(--terra);color:#fff;font-size:10px;font-weight:700;letter-spacing:.14em;padding:3px 10px;border-radius:4px}
+.theory ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.theory li{font-size:14.5px;padding-left:18px;position:relative}
+.theory li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;background:var(--terra);border-radius:2px}
+.q{font-size:clamp(17px,2vw,20px);font-weight:600;margin-bottom:16px;color:#fff}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;background:var(--ink2);border:1.5px solid var(--ink3);color:var(--beige);border-radius:14px;padding:15px 18px;font:inherit;font-size:15px;cursor:pointer;transition:.18s}
+.opt kbd{font:inherit;font-size:12px;font-weight:700;color:var(--grey2);border:1.5px solid var(--ink3);border-radius:7px;width:28px;height:28px;display:grid;place-items:center;flex:none;transition:.18s}
+.opt:hover:not(:disabled){border-color:var(--terra);transform:translateX(4px)}
+.opt:hover:not(:disabled) kbd{border-color:var(--terra);color:var(--terra)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:rgba(95,143,107,.14)}
+.opt.right kbd{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);background:rgba(194,69,58,.14)}
+.opt.wrong kbd{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dim{opacity:.4}
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 24px;
-        }
+.debrief{margin-top:20px;border:1.5px solid var(--ink3);border-radius:16px;overflow:hidden;animation:up .35s ease}
+.debrief .head{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.debrief.ok .head{background:var(--ok);color:#fff}
+.debrief.bad .head{background:var(--bad);color:#fff}
+.debrief .body{padding:18px 20px;display:grid;gap:12px;background:var(--ink2)}
+.debrief p{font-size:14.5px;color:var(--grey)}
+.calc{font-variant-numeric:tabular-nums;background:var(--ink);border-left:3px solid var(--terra);padding:11px 14px;border-radius:0 10px 10px 0;font-size:14px;color:var(--beige)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.gain{font-size:13px;color:var(--grey2)}.gain b{color:var(--terra);font-size:17px}
+.btn{background:var(--terra);color:#fff;border:0;border-radius:12px;padding:13px 26px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:.18s}
+.btn:hover{background:var(--terra2);transform:translateY(-1px)}
+.btn.ghost{background:transparent;border:1.5px solid var(--ink3);color:var(--beige)}
+.btn.ghost:hover{border-color:var(--terra);background:transparent}
+.note{margin-top:28px;font-size:11.5px;color:var(--grey2)}
 
-        .app-container {
-            width: 100%;
-            max-width: 980px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            box-shadow: var(--shadow-soft);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 720px;
-            position: relative;
-        }
+/* Intro / Final */
+.big{font-size:clamp(46px,8vw,84px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--terra);font-variant-numeric:tabular-nums}
+.lead{font-size:17px;color:var(--grey);max-width:620px;margin-bottom:26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.grid3 div{background:var(--ink2);border:1px solid var(--ink3);border-radius:14px;padding:16px}
+.grid3 b{display:block;font-size:26px;color:var(--terra)}
+.grid3 span{font-size:12.5px;color:var(--grey2)}
+.recap{display:grid;gap:6px;margin:18px 0 26px}
+.recap div{display:flex;justify-content:space-between;gap:12px;background:var(--ink2);border-radius:10px;padding:10px 14px;font-size:13.5px}
+.recap .y{border-left:3px solid var(--ok)}.recap .n{border-left:3px solid var(--bad)}
+.fade{animation:up .4s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-        /* Шапка */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 36px;
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: var(--text-primary);
-        }
-
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-brand);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-            color: white;
-        }
-
-        .progress-pill {
-            background: var(--card-subtle);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        /* Панель метрик */
-        .dashboard-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            padding: 20px 36px;
-            background: var(--bg-main);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .metric-card {
-            background: var(--card-bg);
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .metric-title {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 600;
-        }
-
-        .metric-value {
-            font-size: 20px;
-            font-weight: 700;
-            margin-top: 6px;
-            letter-spacing: -0.3px;
-        }
-
-        .value-green { color: var(--accent-green); }
-        .value-brand { color: var(--accent-brand); }
-        .value-red { color: var(--accent-red); }
-        .value-gold { color: var(--accent-gold); }
-
-        /* Экран игры / интро */
-        .game-screen {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            padding: 36px;
-            justify-content: space-between;
-        }
-
-        /* Интро-экран */
-        .intro-container {
-            animation: fadeIn 0.4s ease-out;
-            max-width: 820px;
-            margin: 0 auto;
-        }
-
-        .intro-badge {
-            display: inline-block;
-            background: var(--accent-brand-light);
-            color: var(--accent-brand);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 30px;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .intro-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            line-height: 1.3;
-        }
-
-        .intro-text {
-            font-size: 15px;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .info-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .info-card {
-            background: var(--card-subtle);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .info-card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .info-card-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* Сценарии */
-        .scenario-container {
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        .scenario-badge {
-            display: inline-block;
-            background: var(--accent-brand-light);
-            color: var(--accent-brand);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 30px;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .scenario-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
-
-        .scenario-text {
-            color: var(--text-secondary);
-            line-height: 1.7;
-            font-size: 15px;
-            max-width: 860px;
-        }
-
-        /* Варианты ответов */
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-top: 28px;
-        }
-
-        .option-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            padding: 20px 24px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .option-card:hover {
-            border-color: var(--accent-brand);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(217, 93, 57, 0.08);
-        }
-
-        .option-content {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding-right: 16px;
-        }
-
-        .option-label {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .option-hint {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .option-badge {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-
-        .badge-green { background: var(--accent-green-bg); color: var(--accent-green); }
-        .badge-red { background: var(--accent-red-bg); color: var(--accent-red); }
-        .badge-gold { background: var(--accent-gold-bg); color: var(--accent-gold); }
-
-        /* Модальное окно с обратной связью */
-        .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(44, 42, 41, 0.4);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .feedback-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 36px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: var(--shadow-modal);
-            animation: slideUp 0.3s ease-out;
-        }
-
-        .feedback-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .feedback-status-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .status-success { background: var(--accent-green-bg); color: var(--accent-green); }
-        .status-warning { background: var(--accent-red-bg); color: var(--accent-red); }
-
-        .feedback-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .feedback-text {
-            color: var(--text-secondary);
-            font-size: 15px;
-            line-height: 1.65;
-            margin-bottom: 24px;
-        }
-
-        .feedback-changes {
-            background: var(--card-subtle);
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 28px;
-            font-size: 13px;
-        }
-
-        .change-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            color: var(--text-primary);
-        }
-
-        /* Кнопки */
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-brand);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            letter-spacing: 0.3px;
-        }
-
-        .btn-primary:hover {
-            background: #be4e2b;
-        }
-
-        /* Финальный экран */
-        .results-container {
-            text-align: center;
-            padding: 20px 0;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .results-score {
-            font-size: 54px;
-            font-weight: 700;
-            margin: 16px 0;
-            color: var(--accent-brand);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-bar { grid-template-columns: repeat(2, 1fr); }
-            .info-cards-grid { grid-template-columns: 1fr; }
-            .app-header { padding: 16px 20px; }
-            .game-screen { padding: 20px; }
-        }
-    </style>
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:16px 20px;gap:14px}
+  .steps{display:none}
+  .stats{grid-template-columns:repeat(3,1fr);flex:1;min-width:260px}
+  .stat.wide{grid-column:auto}.stat b,.stat.wide b{font-size:17px}
+  .grid3{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-
-<div class="app-container">
-    <!-- Шапка -->
-    <div class="app-header">
-        <div class="brand-logo">
-            <div class="brand-icon">Т</div>
-            <span>TEPLOLUXE • Налоговый Симулятор</span>
-        </div>
-        <div class="progress-pill" id="step-counter">Вводный курс</div>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="logo">ТЕПЛОЛЮКС</div><small>Корпоративное обучение<br>Финансовая грамотность</small></div>
+    <div class="stats">
+      <div class="stat wide"><span>Выявлено выгоды</span><b id="sGain">0 ₽</b></div>
+      <div class="stat"><span>Верно</span><b id="sOk">0</b></div>
+      <div class="stat"><span>Серия</span><b id="sStreak">0</b></div>
     </div>
-
-    <!-- Панель метрик -->
-    <div class="dashboard-bar">
-        <div class="metric-card">
-            <div class="metric-title">Личный баланс</div>
-            <div class="metric-value value-green" id="metric-balance">150 000 ₽</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-title">Налоговые вычеты</div>
-            <div class="metric-value value-brand" id="metric-deduction">0 ₽</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-title">Риск штрафов</div>
-            <div class="metric-value value-red" id="metric-risk">0%</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-title">Фин. Грамотность</div>
-            <div class="metric-value value-gold" id="metric-score">100 / 100</div>
-        </div>
-    </div>
-
-    <!-- Главный экран -->
-    <div class="game-screen" id="game-screen">
-        <!-- Контент инжектируется через JS -->
-    </div>
-
-    <!-- Модальное окно результатов выбора -->
-    <div class="modal-overlay" id="modal">
-        <div class="feedback-card">
-            <div class="feedback-header">
-                <div class="feedback-status-icon" id="modal-icon">✓</div>
-                <div class="feedback-title" id="modal-title">Правовой разбор</div>
-            </div>
-            <div class="feedback-text" id="modal-text"></div>
-            <div class="feedback-changes" id="modal-changes"></div>
-            <button class="btn-primary" id="modal-next-btn" onclick="nextQuestion()">Продолжить</button>
-        </div>
-    </div>
+    <ol class="steps" id="steps"></ol>
+  </aside>
+  <main id="main"></main>
 </div>
 
 <script>
-    // Сценарии и данные игры
-    const scenarios = [
-        {
-            id: 1,
-            badge: "Социальный вычет • Лимит 150 000 ₽",
-            title: "Оплата обучения и спорта",
-            text: "За прошедший год вы потратили 100 000 ₽ на IT-курсы и 40 000 ₽ на абонемент в фитнес-клуб. Вы платите официальный НДФЛ. Как поступить с этими расходами?",
-            options: [
-                {
-                    label: "Подать заявление на социальный вычет через Личный кабинет ФНС",
-                    hint: "Приложить договоры и чеки на обучение и спорт",
-                    badge: "+18 200 ₽ к возврату",
-                    badgeStyle: "badge-green",
-                    impact: { balance: 0, deduction: 18200, risk: 0, score: 20 },
-                    feedbackTitle: "Верно!",
-                    feedbackText: "Согласно НК РФ, вы имеете право вернуть 13% от расходов на обучение и спорт. Суммарный лимит расходов для социального вычета составляет 150 000 ₽ в год, поэтому вы полностью возвращаете 18 200 ₽ (13% от 140 000 ₽).",
-                    isSuccess: true
-                },
-                {
-                    label: "Ничего не предпринимать",
-                    hint: "Считать, что процедура слишком сложная",
-                    badge: "0 ₽ выгоды",
-                    badgeStyle: "badge-gold",
-                    impact: { balance: 0, deduction: 0, risk: 0, score: -10 },
-                    feedbackTitle: "Упущенная выгода",
-                    feedbackText: "Подача декларации 3-НДФЛ онлайн занимает не более 15 минут. Вы упустили законную возможность вернуть 18 200 ₽ уплаченных налогов.",
-                    isSuccess: false
-                },
-                {
-                    label: "Оформить фиктивный акт консультационных услуг для увеличения суммы",
-                    hint: "Попробовать списать больше расходов",
-                    badge: "Риск проверки",
-                    badgeStyle: "badge-red",
-                    impact: { balance: 0, deduction: 0, risk: 35, score: -30 },
-                    feedbackTitle: "Высокий риск!",
-                    feedbackText: "ФНС автоматически сверяет данные из чеков и реестров лицензированных организаций. Подложные документы ведут к отказу, штрафу 20–40% и пени.",
-                    isSuccess: false
-                }
-            ]
-        },
-        {
-            id: 2,
-            badge: "Фриланс & Прогрессивная шкала",
-            title: "Проектная подработка",
-            text: "Вы выполнили дизайн-проект для компании на сумму 100 000 ₽. Заказчик предлагает перевести деньги напрямую на вашу карту без оформления документов. Как поступить?",
-            options: [
-                {
-                    label: "Зарегистрировать доход в приложении «Мой налог» (НПД)",
-                    hint: "Оплатить налог 6% (6 000 ₽) с дохода от юридического лица",
-                    badge: "100% Легально",
-                    badgeStyle: "badge-green",
-                    impact: { balance: 94000, deduction: 0, risk: 0, score: 20 },
-                    feedbackTitle: "Грамотный выбор!",
-                    feedbackText: "Режим самозанятости позволяет полностью легализовать доход от разовых подработок с минимальной налоговой нагрузкой и без деклараций.",
-                    isSuccess: true
-                },
-                {
-                    label: "Принять перевод на личную карту без формирования чека",
-                    hint: "Рассчитывать, что банковский контроль не заметит перевод",
-                    badge: "Риск по 115-ФЗ",
-                    badgeStyle: "badge-red",
-                    impact: { balance: 100000, deduction: 0, risk: 30, score: -20 },
-                    feedbackTitle: "Незаконная предпринимательская деятельность",
-                    feedbackText: "Банк может заблокировать счет по 115-ФЗ до выяснения происхождения средств, а ФНС начислит НДФЛ 13% плюс штрафы.",
-                    isSuccess: false
-                }
-            ]
-        },
-        {
-            id: 3,
-            badge: "Инвестиции • ИИС",
-            title: "Инвестиционный доход",
-            text: "За год вы получили доход от продажи ценных бумаг на фондовом рынке. Также вы пополнили Индивидуальный инвестиционный счет (ИИС) на 400 000 ₽. Как оптимизировать налоги?",
-            options: [
-                {
-                    label: "Оформить инвестиционный вычет по ИИС (Тип А / ИИС-3)",
-                    hint: "Запросить возврат 13% от суммы пополнения",
-                    badge: "+52 000 ₽ вычета",
-                    badgeStyle: "badge-green",
-                    impact: { balance: 0, deduction: 52000, risk: 0, score: 25 },
-                    feedbackTitle: "Отличная стратегия!",
-                    feedbackText: "Пополнение ИИС позволяет ежегодно возвращать до 52 000 ₽ (13% от лимита в 400 000 ₽) из ранее уплаченного НДФЛ.",
-                    isSuccess: true
-                },
-                {
-                    label: "Не подавать на вычет, положившись только на брокера",
-                    hint: "Брокер удержал налог с продаж, но вычет по ИИС не оформил",
-                    badge: "Пропущен вычет",
-                    badgeStyle: "badge-gold",
-                    impact: { balance: 0, deduction: 0, risk: 0, score: -5 },
-                    feedbackTitle: "Пассивная позиция",
-                    feedbackText: "Брокер выступает налоговым агентом по доходам от ценных бумаг, но оформление налогового вычета по ИИС — это личное право инвестора.",
-                    isSuccess: false
-                }
-            ]
-        },
-        {
-            id: 4,
-            badge: "Недвижимость & Продажа",
-            title: "Продажа квартиры раньше минимального срока",
-            text: "Вы продаете квартиру за 7 000 000 ₽, которая была куплена 2 года назад за 6 000 000 ₽ (минимальный владения — 5 лет). Какую сумму выбрать для расчета НДФЛ?",
-            options: [
-                {
-                    label: "Уменьшить доходы на сумму подтвержденных расходов (доход 1 млн ₽)",
-                    hint: "Заплатить НДФЛ 13% с разницы (130 000 ₽)",
-                    badge: "Налог: 130 000 ₽",
-                    badgeStyle: "badge-green",
-                    impact: { balance: -130000, deduction: 0, risk: 0, score: 20 },
-                    feedbackTitle: "Законный и оптимальный расчет!",
-                    feedbackText: "НК РФ позволяет снизить налогооблагаемую базу на величину фактически понесенных и документально подтвержденных расходов на покупку.",
-                    isSuccess: true
-                },
-                {
-                    label: "Занизить стоимость в договоре до 6 000 000 ₽",
-                    hint: "Забрать 1 000 000 ₽ наличными через расписку",
-                    badge: "Высокий риск",
-                    badgeStyle: "badge-red",
-                    impact: { balance: 0, deduction: 0, risk: 55, score: -40 },
-                    feedbackTitle: "Правовое нарушение!",
-                    feedbackText: "Налоговая инспекция автоматически сопоставляет цену сделки с кадастровой стоимостью (не менее 70%). Это приводит к перерасчету, доначислению и штрафам.",
-                    isSuccess: false
-                }
-            ]
-        },
-        {
-            id: 5,
-            badge: "Имущественный вычет",
-            title: "Покупка жилья в ипотеку",
-            text: "Вы приобрели квартиру за 5 000 000 ₽ с привлечением ипотеки. Какую максимальную сумму вычета за покупку (без учета процентов) можно заявтить?",
-            options: [
-                {
-                    label: "260 000 ₽ (13% от установленного лимита 2 000 000 ₽)",
-                    hint: "Плюс в будущем вычет по ипотечным процентам",
-                    badge: "Максимальный вычет",
-                    badgeStyle: "badge-green",
-                    impact: { balance: 0, deduction: 260000, risk: 0, score: 25 },
-                    feedbackTitle: "Абсолютно верно!",
-                    feedbackText: "Законодательный лимит расходов для имущественного вычета при покупке жилья составляет 2 000 000 ₽. Максимальный возврат на руки — 260 000 ₽.",
-                    isSuccess: true
-                },
-                {
-                    label: "650 000 ₽ (13% от полной стоимости 5 000 000 ₽)",
-                    hint: "Расчет без учета предельного лимита",
-                    badge: "Ошибка в лимитах",
-                    badgeStyle: "badge-gold",
-                    impact: { balance: 0, deduction: 260000, risk: 0, score: -10 },
-                    feedbackTitle: "Превышение лимита",
-                    feedbackText: "Закон ограничивает максимальный размер вычета на покупку квартиры суммой в 260 000 ₽. Подать заявку на большее нельзя.",
-                    isSuccess: false
-                }
-            ]
-        }
-    ];
+/* ============ КОНТЕНТ ============ */
+const CASES = [
+ {tag:"Основы", title:"Как работает вычет",
+  theory:["Вычет уменьшает налоговую базу, а не выплачивается «деньгами».","Возвращается 13% от суммы расходов (в пределах лимита) — и не больше, чем вы заплатили налога за год."],
+  q:"На лечение вы потратили 150 000 ₽. Сколько денег вернётся на счёт?",
+  opts:["150 000 ₽","19 500 ₽","13 000 ₽"], ok:1, gain:19500,
+  calc:"150 000 ₽ × 13% = 19 500 ₽",
+  why:"Вычет — это база для расчёта. На счёт возвращается только 13% от неё."},
 
-    let currentStep = -1; // -1 = Интро экран
-    let state = {
-        balance: 150000,
-        deduction: 0,
-        risk: 0,
-        score: 100
-    };
+ {tag:"НДФЛ", title:"Прогрессивная шкала",
+  theory:["С 2025 года шкала НДФЛ: 13% до 2,4 млн ₽; 15% — 2,4–5 млн; 18% — 5–20 млн; 20% — 20–50 млн; 22% — свыше 50 млн ₽.","Повышенная ставка применяется только к части дохода сверх порога."],
+  q:"Годовой доход сотрудника — 3 000 000 ₽. Сколько составит НДФЛ?",
+  opts:["390 000 ₽ (13% со всей суммы)","402 000 ₽","450 000 ₽ (15% со всей суммы)"], ok:1, gain:0,
+  calc:"2 400 000 × 13% + 600 000 × 15% = 312 000 + 90 000 = 402 000 ₽",
+  why:"Ставка 15% применяется только к «хвосту» дохода выше 2,4 млн ₽."},
 
-    function updateDashboard() {
-        document.getElementById('metric-balance').innerText = state.balance.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('metric-deduction').innerText = state.deduction.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('metric-risk').innerText = state.risk + '%';
-        document.getElementById('metric-score').innerText = state.score + ' / 100';
-        
-        if (currentStep === -1) {
-            document.getElementById('step-counter').innerText = 'Вводный курс';
-        } else if (currentStep < scenarios.length) {
-            document.getElementById('step-counter').innerText = `Ситуация ${currentStep + 1} из ${scenarios.length}`;
-        } else {
-            document.getElementById('step-counter').innerText = 'Завершено';
-        }
-    }
+ {tag:"Сроки", title:"Трёхлетнее окно",
+  theory:["Вернуть налог можно за последние 3 года, предшествующие году подачи декларации.","Подать 3-НДФЛ можно в любое время года, если вычет заявляется за прошедшие периоды."],
+  q:"В 2026 году вы узнали о вычете за обучение, оплаченное в 2022 году. Можно ли его получить?",
+  opts:["Да, срока давности нет","Нет — за 2022 год уже поздно, вернуть можно за 2023–2025 гг.","Только через суд"], ok:1, gain:0,
+  calc:"Подача в 2026 г. → охват периодов: 2023, 2024, 2025",
+  why:"Расходы 2022 года вне трёхлетнего периода. Поэтому вычетами лучше заниматься каждый год, не откладывая."},
 
-    function renderIntro() {
-        const screen = document.getElementById('game-screen');
-        screen.innerHTML = `
-            <div class="intro-container">
-                <div class="intro-badge">Финансовая грамотность • 2026</div>
-                <h1 class="intro-title">Как работать с налоговой системой и вычетами в РФ</h1>
-                <p class="intro-text">
-                    Каждый официально работающий гражданин России уплачивает <strong>НДФЛ (Налог на доходы физических лиц)</strong>. 
-                    Налоговые вычеты — это законный инструмент, позволяющий уменьшить сумму налога или вернуть часть ранее уплаченных средств из бюджета обратно на ваш счет.
-                </p>
+ {tag:"Недвижимость", title:"Покупка квартиры семьёй",
+  theory:["Имущественный вычет: база до 2 000 000 ₽ — возврат до 260 000 ₽ на человека.","Вычет по ипотечным процентам: база до 3 000 000 ₽ — до 390 000 ₽ на человека.","Супруги-собственники используют лимиты каждый отдельно."],
+  q:"Квартира за 6 млн ₽ куплена в ипотеку, оба супруга — собственники и налогоплательщики. Какой максимум возврата за саму покупку (без процентов)?",
+  opts:["260 000 ₽ — лимит один на семью","520 000 ₽","780 000 ₽"], ok:1, gain:520000,
+  calc:"2 × (2 000 000 ₽ × 13%) = 2 × 260 000 = 520 000 ₽",
+  why:"Лимит 2 млн ₽ применяется к каждому собственнику. Ещё до 780 000 ₽ семья вернёт по процентам ипотеки (2 × 390 000 ₽)."},
 
-                <div class="info-cards-grid">
-                    <div class="info-card">
-                        <div class="info-card-title">💡 Что такое Налоговый Вычет?</div>
-                        <div class="info-card-desc">Это сумма, которая уменьшает налогооблагаемую базу. Вы можете вернуть 13% от потраченных средств на лечение, обучение, спорт, покупку квартиры или инвестиции.</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-card-title">⚖️ Прогрессивная шкала НДФЛ</div>
-                        <div class="info-card-desc">В зависимости от уровня годового дохода ставка НДФЛ составляет от 13% до 22%. Грамотное планирование вычетов позволяет существенно сберечь личный бюджет.</div>
-                    </div>
-                </div>
+ {tag:"Лимиты", title:"Социальные вычеты: корзины",
+  theory:["Общий лимит на себя (обучение, лечение, фитнес и др.) — 150 000 ₽ в год.","Обучение детей — отдельный лимит 110 000 ₽ на каждого ребёнка."],
+  q:"За год: своё обучение 40 000 ₽, фитнес 90 000 ₽, обучение сына 80 000 ₽. Сколько вернут?",
+  opts:["19 500 ₽ — всё в один лимит 150 000 ₽","16 900 ₽ — только траты на себя","27 300 ₽"], ok:2, gain:27300,
+  calc:"(40 000 + 90 000) + 80 000 = 210 000 ₽ × 13% = 27 300 ₽",
+  why:"Траты на себя (130 000 ₽) укладываются в лимит 150 000 ₽, а обучение сына (80 000 ₽) — в отдельную «корзину» 110 000 ₽."},
 
-                <p class="intro-text" style="font-size: 14px; margin-bottom: 28px;">
-                    Вам предстоит пройти 5 реальных жизненных сценариев. Ваша цель — принимать финансово и юридически грамотные решения, накапливать вычеты и минимизировать риски штрафов.
-                </p>
+ {tag:"Лечение", title:"Дорогостоящее лечение",
+  theory:["Расходы на виды лечения из специального перечня Правительства не входят в лимит 150 000 ₽.","Возврат считается с фактической суммы (код услуги в справке — «2»)."],
+  q:"Операция из перечня дорогостоящих обошлась в 400 000 ₽. Сколько можно вернуть?",
+  opts:["19 500 ₽ — не больше лимита","52 000 ₽","Ничего, лечение платное"], ok:1, gain:52000,
+  calc:"400 000 ₽ × 13% = 52 000 ₽",
+  why:"Дорогостоящее лечение вычитается без ограничения лимитом — важно получить справку об оплате медуслуг с правильным кодом."},
 
-                <button class="btn-primary" onclick="startGame()">Начать симуляцию</button>
-            </div>
-        `;
-        updateDashboard();
-    }
+ {tag:"Ограничения", title:"Возврат ≤ уплаченного налога",
+  theory:["Нельзя вернуть больше НДФЛ, чем удержано за год.","Неиспользованный остаток имущественного вычета переносится на следующие годы."],
+  q:"Вычет на покупку жилья даёт право на 260 000 ₽, но за год удержано НДФЛ 80 000 ₽. Что произойдёт?",
+  opts:["Вернут 260 000 ₽ сразу","Вернут 80 000 ₽, остаток перенесётся на следующие годы","Вычет сгорит"], ok:1, gain:80000,
+  calc:"min(260 000; 80 000) = 80 000 ₽ · остаток 180 000 ₽ → в следующие годы",
+  why:"Имущественный вычет не сгорает: он используется частями, пока лимит не будет выбран полностью."},
 
-    function startGame() {
-        currentStep = 0;
-        renderScenario();
-    }
+ {tag:"Семья", title:"Стандартный вычет на детей",
+  theory:["С 2025 года: 1 400 ₽/мес. на 1-го и на 2-го ребёнка, 3 000 ₽ — на 3-го и каждого следующего.","Действует, пока доход с начала года не превысит 450 000 ₽. Дети до 18 лет и студенты очной формы до 24 лет.","Оформляется заявлением у работодателя."],
+  q:"Двое детей, зарплата 30 000 ₽/мес. Как оформить и сколько это даст за год?",
+  opts:["Через работодателя, ≈ 4 368 ₽ в год","Только декларацией в конце года, 2 800 ₽","Автоматически, без заявления, 36 400 ₽"], ok:0, gain:4368,
+  calc:"(1 400 + 1 400) × 13% = 364 ₽/мес. × 12 = 4 368 ₽ · доход за год 360 000 ₽ < 450 000 ₽",
+  why:"Достаточно заявления и документов бухгалтерии — деньги приходят в зарплате уже в текущем году."},
 
-    function renderScenario() {
-        if (currentStep >= scenarios.length) {
-            renderFinalResults();
-            return;
-        }
+ {tag:"Самостоятельно", title:"Доход без налогового агента",
+  theory:["С зарплаты налог удерживает работодатель — налоговый агент.","С дохода, по которому агента нет (аренда от физлица, продажа имущества и др.), налог декларирует сам гражданин."],
+  q:"Вы сдаёте квартиру, арендатор платит на карту напрямую. Что делать?",
+  opts:["Ничего — налог с зарплаты уже удержан","Подать 3-НДФЛ до 30 апреля следующего года и уплатить налог до 15 июля","Уведомить работодателя"], ok:1, gain:0,
+  calc:"Декларация — до 30.04, уплата — до 15.07 года, следующего за отчётным",
+  why:"Зарплата и аренда — разные источники. Неуплата влечёт штраф и пени. Альтернатива — режим самозанятого."},
 
-        const data = scenarios[currentStep];
-        const screen = document.getElementById('game-screen');
+ {tag:"Здоровье", title:"ГТО + диспансеризация",
+  theory:["Новый вычет: 18 000 ₽ базы при выполнении нормативов ГТО и прохождении диспансеризации.","Оба события должны произойти в одном календарном году. Условия уточняйте в актуальной редакции НК РФ."],
+  q:"ГТО сдано в марте 2026 г., диспансеризация пройдена в декабре 2025 г. Есть ли право на вычет?",
+  opts:["Да, оба события выполнены","Нет — события в разных годах","Да, но только 50%"], ok:1, gain:0,
+  calc:"Если оба события в одном году: 18 000 ₽ × 13% = 2 340 ₽",
+  why:"Пройдите диспансеризацию в 2026 году — тогда вычет 2 340 ₽ будет доступен."}
+];
 
-        screen.innerHTML = `
-            <div class="scenario-container">
-                <div class="scenario-badge">📌 ${data.badge}</div>
-                <h2 class="scenario-title">${data.title}</h2>
-                <p class="scenario-text">${data.text}</p>
-                
-                <div class="options-grid">
-                    ${data.options.map((opt, idx) => `
-                        <div class="option-card" onclick="selectOption(${idx})">
-                            <div class="option-content">
-                                <div class="option-label">${opt.label}</div>
-                                <div class="option-hint">${opt.hint}</div>
-                            </div>
-                            <div class="option-badge ${opt.badgeStyle}">${opt.badge}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
+/* ============ СОСТОЯНИЕ ============ */
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('ru-RU') + ' ₽';
+let S;
+const fresh = () => ({i:-1, ok:0, gain:0, streak:0, best:0, res:[], order:[]});
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+let answered = false;
 
-        updateDashboard();
-    }
+function renderSide(){
+  $('sGain').textContent = fmt(S.gain);
+  $('sOk').textContent = S.ok + '/' + CASES.length;
+  $('sStreak').textContent = S.streak;
+  $('steps').innerHTML = CASES.map((c,k)=>{
+    const r = S.res[k]; let cls = k===S.i ? 'cur' : (r===true?'ok':r===false?'bad':'');
+    return `<li class="${cls}"><i>${r===true?'✓':r===false?'✕':k+1}</i>${c.title}</li>`;
+  }).join('');
+}
 
-    function selectOption(optionIndex) {
-        const scenario = scenarios[currentStep];
-        const selected = scenario.options[optionIndex];
+function intro(){
+  S = fresh(); renderSide();
+  $('main').innerHTML = `<div class="fade">
+    <div class="kicker">Программа для сотрудников <em>· ~10 минут</em></div>
+    <h1>Ваши деньги — в вашем кошельке.<br>Знаете, какие вычеты вам положены?</h1>
+    <p class="lead">Практический тренажёр: краткая теория, реальные расчётные кейсы и разбор каждого ответа. Пройдите 10 ситуаций и узнайте, сколько налога можно законно вернуть.</p>
+    <div class="grid3">
+      <div><b>10</b><span>практических кейсов</span></div>
+      <div><b>13%</b><span>базовая ставка возврата</span></div>
+      <div><b>3 года</b><span>окно для возврата налога</span></div>
+    </div>
+    <button class="btn" onclick="next()">Начать обучение →</button>
+    <p class="note">Материал учебный и не является налоговой консультацией. Цифры соответствуют НК РФ на 2026 год; в спорных случаях сверяйтесь с ФНС или бухгалтерией.</p>
+  </div>`;
+}
 
-        state.balance += selected.impact.balance;
-        state.deduction += selected.impact.deduction;
-        state.risk = Math.min(100, Math.max(0, state.risk + selected.impact.risk));
-        state.score = Math.max(0, state.score + selected.impact.score);
+function next(){
+  S.i++; answered = false;
+  if (S.i >= CASES.length) return final();
+  const c = CASES[S.i];
+  S.order = shuffle(c.opts.map((t,k)=>k));
+  renderSide();
+  $('main').innerHTML = `<div class="fade">
+    <div class="bar"><div id="pb"></div></div>
+    <div class="kicker">${c.tag} <em>· кейс ${S.i+1} из ${CASES.length}</em></div>
+    <h1>${c.title}</h1>
+    <div class="theory"><ul>${c.theory.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <p class="q">${c.q}</p>
+    <div class="opts" id="opts">${S.order.map((k,n)=>`<button class="opt" data-k="${k}"><kbd>${n+1}</kbd><span>${c.opts[k]}</span></button>`).join('')}</div>
+    <div id="deb"></div>
+  </div>`;
+  requestAnimationFrame(()=>{ $('pb').style.width = (S.i/CASES.length*100)+'%'; });
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-        const modal = document.getElementById('modal');
-        const modalIcon = document.getElementById('modal-icon');
-        const modalTitle = document.getElementById('modal-title');
-        const modalText = document.getElementById('modal-text');
-        const modalChanges = document.getElementById('modal-changes');
+function answer(k){
+  if (answered) return; answered = true;
+  const c = CASES[S.i], good = k===c.ok;
+  S.res[S.i] = good;
+  if (good){ S.ok++; S.gain += c.gain; S.streak++; S.best = Math.max(S.best,S.streak);} else S.streak = 0;
+  document.querySelectorAll('.opt').forEach(b=>{
+    const bk=+b.dataset.k; b.disabled = true;
+    if (bk===c.ok) b.classList.add('right');
+    else if (bk===k) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  const last = S.i === CASES.length-1;
+  $('deb').innerHTML = `<div class="debrief ${good?'ok':'bad'}">
+    <div class="head">${good?'Верно':'Неверно — разберём'}</div>
+    <div class="body">
+      <p>${c.why}</p>
+      <div class="calc">${c.calc}</div>
+      <div class="foot">
+        <div class="gain">${good && c.gain ? `Ваша выгода в кейсе: <b>+${fmt(c.gain)}</b>` : good ? 'Отличное понимание правила' : 'Запомните расчёт — он встретится на практике'}</div>
+        <button class="btn" onclick="next()">${last?'Показать итоги':'Дальше →'}</button>
+      </div>
+    </div></div>`;
+  renderSide();
+  $('deb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 
-        modalIcon.className = `feedback-status-icon ${selected.isSuccess ? 'status-success' : 'status-warning'}`;
-        modalIcon.innerText = selected.isSuccess ? '✓' : '!';
-        modalTitle.innerText = selected.feedbackTitle;
-        modalText.innerText = selected.feedbackText;
+function final(){
+  renderSide();
+  const p = Math.round(S.ok/CASES.length*100);
+  const lvl = p>=90?'Эксперт по вычетам':p>=70?'Уверенный уровень':p>=50?'Базовый уровень':'Есть что повторить';
+  $('main').innerHTML = `<div class="fade">
+    <div class="bar"><div style="width:100%"></div></div>
+    <div class="kicker">Итоги <em>· ${lvl}</em></div>
+    <div class="big">${fmt(S.gain)}</div>
+    <p class="lead" style="margin-top:10px">Суммарная выгода по кейсам, где вы дали верный ответ. Верных ответов: <b>${S.ok} из ${CASES.length}</b> (${p}%), лучшая серия — ${S.best}.</p>
+    <div class="recap">${CASES.map((c,k)=>`<div class="${S.res[k]?'y':'n'}"><span>${c.title}</span><span>${S.res[k]?'✓ верно':'✕ повторить'}</span></div>`).join('')}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn" onclick="intro()">Пройти заново</button>
+      <button class="btn ghost" onclick="window.print()">Сохранить итоги</button>
+    </div>
+    <p class="note">Чтобы оформить вычет: обратитесь в бухгалтерию (стандартные вычеты) или подайте 3-НДФЛ через личный кабинет налогоплательщика на nalog.gov.ru.</p>
+  </div>`;
+}
 
-        modalChanges.innerHTML = `
-            <div class="change-item"><span>Баллы грамотности:</span> <strong>${selected.impact.score >= 0 ? '+' : ''}${selected.impact.score} б.</strong></div>
-            ${selected.impact.deduction ? `<div class="change-item"><span>Налоговый вычет:</span> <strong>+${selected.impact.deduction.toLocaleString('ru-RU')} ₽</strong></div>` : ''}
-            ${selected.impact.risk ? `<div class="change-item"><span>Изменение риска:</span> <strong>+${selected.impact.risk}%</strong></div>` : ''}
-        `;
+document.addEventListener('keydown',e=>{
+  if (S.i<0 || S.i>=CASES.length) return;
+  const n = parseInt(e.key,10);
+  if (!answered && n>=1 && n<=S.order.length) answer(S.order[n-1]);
+  else if (answered && (e.key==='Enter'||e.key==='ArrowRight')) next();
+});
 
-        modal.classList.add('active');
-    }
-
-    function nextQuestion() {
-        document.getElementById('modal').classList.remove('active');
-        currentStep++;
-        renderScenario();
-    }
-
-    function renderFinalResults() {
-        const screen = document.getElementById('game-screen');
-        updateDashboard();
-
-        let statusText = "";
-        if (state.score >= 140) {
-            statusText = "Вы продемонстрировали высокий уровень налоговой грамотности. Вы эффективно используете преференции законодательства РФ и защищены от рисков.";
-        } else if (state.score >= 90) {
-            statusText = "Хороший результат. Вы понимаете ключевые правила, но упускаете некоторые законные возможности для налоговой оптимизации.";
-        } else {
-            statusText = "Уровень риска превышает безопасную норму. Рекомендуется глубже изучить статьи Налогового кодекса РФ, чтобы избежать штрафных санкций.";
-        }
-
-        screen.innerHTML = `
-            <div class="results-container">
-                <div class="scenario-badge">Итоги симулятора</div>
-                <h2 class="scenario-title">Финансовый год завершен</h2>
-                
-                <div class="results-score">${state.score} / 190</div>
-                <p class="scenario-text" style="margin: 0 auto 28px auto;">${statusText}</p>
-
-                <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; text-align: left;">
-                    <div style="background: var(--card-subtle); padding: 20px; border-radius: 16px; border:1px solid var(--border-color); flex:1;">
-                        <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Итого вычетов:</div>
-                        <div style="font-size:20px; font-weight:700; color:var(--accent-brand); margin-top:4px;">${state.deduction.toLocaleString('ru-RU')} ₽</div>
-                    </div>
-                    <div style="background: var(--card-subtle); padding: 20px; border-radius: 16px; border:1px solid var(--border-color); flex:1;">
-                        <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Уровень риска:</div>
-                        <div style="font-size:20px; font-weight:700; color:${state.risk > 30 ? 'var(--accent-red)' : 'var(--accent-green)'}; margin-top:4px;">${state.risk}%</div>
-                    </div>
-                </div>
-
-                <button class="btn-primary" onclick="restartGame()">Пройти симуляцию заново</button>
-            </div>
-        `;
-    }
-
-    function restartGame() {
-        currentStep = -1;
-        state = { balance: 150000, deduction: 0, risk: 0, score: 100 };
-        renderIntro();
-    }
-
-    // Инициализация при загрузке
-    renderIntro();
+intro();
 </script>
-
 </body>
 </html>
