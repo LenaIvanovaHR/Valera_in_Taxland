@@ -3,501 +3,823 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Валера в Стране Налогов</title>
+    <title>TEPLOLUXE • Финансовый & Налоговый Симулятор</title>
+    <!-- Подключение премиального шрифта Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body {
+        :root {
+            /* Премиальная светлая палитра (Warm Luxe) */
+            --bg-main: #f7f5f0;          /* Мягкий молочно-бежевый фон */
+            --card-bg: #ffffff;          /* Белоснежные карточки */
+            --card-subtle: #f1ede6;      /* Вторичные блоки */
+            --border-color: #e2dbc9;     /* Тонкие бежевые границы */
+            
+            --text-primary: #2c2a29;     /* Глубокий графитовый (основной текст) */
+            --text-secondary: #706b65;   /* Приглушенный теплый серый */
+            
+            /* Благородные, не ядовитые акценты */
+            --accent-brand: #d95d39;     /* Элегантный терракотово-оранжевый (Теплолюкс) */
+            --accent-brand-light: #fbeee9;
+            --accent-green: #3a7d5c;     /* Приглушенный шалфейно-зеленый */
+            --accent-green-bg: #edf4ef;
+            --accent-red: #c04e4e;       /* Приглушенный припыленно-красный */
+            --accent-red-bg: #f9ecec;
+            --accent-gold: #c29243;      /* Мягкий золотистый */
+            --accent-gold-bg: #f8f3e9;
+
+            --shadow-soft: 0 10px 30px rgba(44, 42, 41, 0.05);
+            --shadow-modal: 0 20px 50px rgba(44, 42, 41, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 980px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: var(--shadow-soft);
             overflow: hidden;
-        }
-        #game-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 720px;
             position: relative;
-            width: 100%;
-            max-width: 1280px;
-            height: 100vh;
-            max-height: 720px;
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            transition: background-image 0.5s ease-in-out;
         }
-        #character-sprite {
-            position: absolute;
-            bottom: 180px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 60%;
-            display: none;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-            border-radius: 20px;
-        }
-        #dialogue-box {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7));
-            border-top: 3px solid #ff8c00;
-            box-sizing: border-box;
-            padding: 20px 40px;
-            cursor: pointer;
+
+        /* Шапка */
+        .app-header {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 36px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
         }
-        #speaker {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff8c00;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-        }
-        #text {
-            font-size: 20px;
-            line-height: 1.5;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            margin: 0;
-        }
-        #hint {
-            position: absolute;
-            bottom: 10px;
-            right: 20px;
-            font-size: 14px;
-            color: #aaa;
-            animation: blink 1.5s infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        #choices {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+
+        .brand-logo {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 60%;
-            display: none;
-            z-index: 10;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
         }
-        .choice-btn {
-            background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #ff8c00;
-            color: white;
-            padding: 15px;
-            font-size: 18px;
-            cursor: pointer;
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-brand);
             border-radius: 8px;
-            transition: all 0.3s;
-            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: white;
         }
-        .choice-btn:hover {
-            background: #ff8c00;
-            color: black;
-            transform: scale(1.02);
-        }
-        #coins-display {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
+
+        .progress-pill {
+            background: var(--card-subtle);
+            padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid #ff8c00;
-            display: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Панель метрик */
+        .dashboard-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 20px 36px;
+            background: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .value-green { color: var(--accent-green); }
+        .value-brand { color: var(--accent-brand); }
+        .value-red { color: var(--accent-red); }
+        .value-gold { color: var(--accent-gold); }
+
+        /* Экран игры / интро */
+        .game-screen {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 36px;
+            justify-content: space-between;
+        }
+
+        /* Интро-экран */
+        .intro-container {
+            animation: fadeIn 0.4s ease-out;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .intro-badge {
+            display: inline-block;
+            background: var(--accent-brand-light);
+            color: var(--accent-brand);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 30px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .intro-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .intro-text {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .info-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .info-card {
+            background: var(--card-subtle);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .info-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Сценарии */
+        .scenario-container {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .scenario-badge {
+            display: inline-block;
+            background: var(--accent-brand-light);
+            color: var(--accent-brand);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 30px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .scenario-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .scenario-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 15px;
+            max-width: 860px;
+        }
+
+        /* Варианты ответов */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .option-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 20px 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--accent-brand);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(217, 93, 57, 0.08);
+        }
+
+        .option-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-right: 16px;
+        }
+
+        .option-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .option-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .option-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .badge-green { background: var(--accent-green-bg); color: var(--accent-green); }
+        .badge-red { background: var(--accent-red-bg); color: var(--accent-red); }
+        .badge-gold { background: var(--accent-gold-bg); color: var(--accent-gold); }
+
+        /* Модальное окно с обратной связью */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 42, 41, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feedback-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 36px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: var(--shadow-modal);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .feedback-status-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .status-success { background: var(--accent-green-bg); color: var(--accent-green); }
+        .status-warning { background: var(--accent-red-bg); color: var(--accent-red); }
+
+        .feedback-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .feedback-text {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.65;
+            margin-bottom: 24px;
+        }
+
+        .feedback-changes {
+            background: var(--card-subtle);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 28px;
+            font-size: 13px;
+        }
+
+        .change-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            color: var(--text-primary);
+        }
+
+        /* Кнопки */
+        .btn-primary {
+            width: 100%;
+            background: var(--accent-brand);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            background: #be4e2b;
+        }
+
+        /* Финальный экран */
+        .results-container {
+            text-align: center;
+            padding: 20px 0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .results-score {
+            font-size: 54px;
+            font-weight: 700;
+            margin: 16px 0;
+            color: var(--accent-brand);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-bar { grid-template-columns: repeat(2, 1fr); }
+            .info-cards-grid { grid-template-columns: 1fr; }
+            .app-header { padding: 16px 20px; }
+            .game-screen { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="coins-display">🪙 Монеты: <span id="coin-count">0</span></div>
-    <img id="character-sprite" src="" alt="Персонаж">
-    
-    <div id="choices"></div>
+<div class="app-container">
+    <!-- Шапка -->
+    <div class="app-header">
+        <div class="brand-logo">
+            <div class="brand-icon">Т</div>
+            <span>TEPLOLUXE • Налоговый Симулятор</span>
+        </div>
+        <div class="progress-pill" id="step-counter">Вводный курс</div>
+    </div>
 
-    <div id="dialogue-box" onclick="nextSlide()">
-        <div id="speaker">Система</div>
-        <p id="text">Загрузка...</p>
-        <div id="hint">Нажмите, чтобы продолжить...</div>
+    <!-- Панель метрик -->
+    <div class="dashboard-bar">
+        <div class="metric-card">
+            <div class="metric-title">Личный баланс</div>
+            <div class="metric-value value-green" id="metric-balance">150 000 ₽</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Налоговые вычеты</div>
+            <div class="metric-value value-brand" id="metric-deduction">0 ₽</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Риск штрафов</div>
+            <div class="metric-value value-red" id="metric-risk">0%</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Фин. Грамотность</div>
+            <div class="metric-value value-gold" id="metric-score">100 / 100</div>
+        </div>
+    </div>
+
+    <!-- Главный экран -->
+    <div class="game-screen" id="game-screen">
+        <!-- Контент инжектируется через JS -->
+    </div>
+
+    <!-- Модальное окно результатов выбора -->
+    <div class="modal-overlay" id="modal">
+        <div class="feedback-card">
+            <div class="feedback-header">
+                <div class="feedback-status-icon" id="modal-icon">✓</div>
+                <div class="feedback-title" id="modal-title">Правовой разбор</div>
+            </div>
+            <div class="feedback-text" id="modal-text"></div>
+            <div class="feedback-changes" id="modal-changes"></div>
+            <button class="btn-primary" id="modal-next-btn" onclick="nextQuestion()">Продолжить</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // СЦЕНАРИЙ ИГРЫ (Данные)
-    // ==========================================
+    // Сценарии и данные игры
+    const scenarios = [
+        {
+            id: 1,
+            badge: "Социальный вычет • Лимит 150 000 ₽",
+            title: "Оплата обучения и спорта",
+            text: "За прошедший год вы потратили 100 000 ₽ на IT-курсы и 40 000 ₽ на абонемент в фитнес-клуб. Вы платите официальный НДФЛ. Как поступить с этими расходами?",
+            options: [
+                {
+                    label: "Подать заявление на социальный вычет через Личный кабинет ФНС",
+                    hint: "Приложить договоры и чеки на обучение и спорт",
+                    badge: "+18 200 ₽ к возврату",
+                    badgeStyle: "badge-green",
+                    impact: { balance: 0, deduction: 18200, risk: 0, score: 20 },
+                    feedbackTitle: "Верно!",
+                    feedbackText: "Согласно НК РФ, вы имеете право вернуть 13% от расходов на обучение и спорт. Суммарный лимит расходов для социального вычета составляет 150 000 ₽ в год, поэтому вы полностью возвращаете 18 200 ₽ (13% от 140 000 ₽).",
+                    isSuccess: true
+                },
+                {
+                    label: "Ничего не предпринимать",
+                    hint: "Считать, что процедура слишком сложная",
+                    badge: "0 ₽ выгоды",
+                    badgeStyle: "badge-gold",
+                    impact: { balance: 0, deduction: 0, risk: 0, score: -10 },
+                    feedbackTitle: "Упущенная выгода",
+                    feedbackText: "Подача декларации 3-НДФЛ онлайн занимает не более 15 минут. Вы упустили законную возможность вернуть 18 200 ₽ уплаченных налогов.",
+                    isSuccess: false
+                },
+                {
+                    label: "Оформить фиктивный акт консультационных услуг для увеличения суммы",
+                    hint: "Попробовать списать больше расходов",
+                    badge: "Риск проверки",
+                    badgeStyle: "badge-red",
+                    impact: { balance: 0, deduction: 0, risk: 35, score: -30 },
+                    feedbackTitle: "Высокий риск!",
+                    feedbackText: "ФНС автоматически сверяет данные из чеков и реестров лицензированных организаций. Подложные документы ведут к отказу, штрафу 20–40% и пени.",
+                    isSuccess: false
+                }
+            ]
+        },
+        {
+            id: 2,
+            badge: "Фриланс & Прогрессивная шкала",
+            title: "Проектная подработка",
+            text: "Вы выполнили дизайн-проект для компании на сумму 100 000 ₽. Заказчик предлагает перевести деньги напрямую на вашу карту без оформления документов. Как поступить?",
+            options: [
+                {
+                    label: "Зарегистрировать доход в приложении «Мой налог» (НПД)",
+                    hint: "Оплатить налог 6% (6 000 ₽) с дохода от юридического лица",
+                    badge: "100% Легально",
+                    badgeStyle: "badge-green",
+                    impact: { balance: 94000, deduction: 0, risk: 0, score: 20 },
+                    feedbackTitle: "Грамотный выбор!",
+                    feedbackText: "Режим самозанятости позволяет полностью легализовать доход от разовых подработок с минимальной налоговой нагрузкой и без деклараций.",
+                    isSuccess: true
+                },
+                {
+                    label: "Принять перевод на личную карту без формирования чека",
+                    hint: "Рассчитывать, что банковский контроль не заметит перевод",
+                    badge: "Риск по 115-ФЗ",
+                    badgeStyle: "badge-red",
+                    impact: { balance: 100000, deduction: 0, risk: 30, score: -20 },
+                    feedbackTitle: "Незаконная предпринимательская деятельность",
+                    feedbackText: "Банк может заблокировать счет по 115-ФЗ до выяснения происхождения средств, а ФНС начислит НДФЛ 13% плюс штрафы.",
+                    isSuccess: false
+                }
+            ]
+        },
+        {
+            id: 3,
+            badge: "Инвестиции • ИИС",
+            title: "Инвестиционный доход",
+            text: "За год вы получили доход от продажи ценных бумаг на фондовом рынке. Также вы пополнили Индивидуальный инвестиционный счет (ИИС) на 400 000 ₽. Как оптимизировать налоги?",
+            options: [
+                {
+                    label: "Оформить инвестиционный вычет по ИИС (Тип А / ИИС-3)",
+                    hint: "Запросить возврат 13% от суммы пополнения",
+                    badge: "+52 000 ₽ вычета",
+                    badgeStyle: "badge-green",
+                    impact: { balance: 0, deduction: 52000, risk: 0, score: 25 },
+                    feedbackTitle: "Отличная стратегия!",
+                    feedbackText: "Пополнение ИИС позволяет ежегодно возвращать до 52 000 ₽ (13% от лимита в 400 000 ₽) из ранее уплаченного НДФЛ.",
+                    isSuccess: true
+                },
+                {
+                    label: "Не подавать на вычет, положившись только на брокера",
+                    hint: "Брокер удержал налог с продаж, но вычет по ИИС не оформил",
+                    badge: "Пропущен вычет",
+                    badgeStyle: "badge-gold",
+                    impact: { balance: 0, deduction: 0, risk: 0, score: -5 },
+                    feedbackTitle: "Пассивная позиция",
+                    feedbackText: "Брокер выступает налоговым агентом по доходам от ценных бумаг, но оформление налогового вычета по ИИС — это личное право инвестора.",
+                    isSuccess: false
+                }
+            ]
+        },
+        {
+            id: 4,
+            badge: "Недвижимость & Продажа",
+            title: "Продажа квартиры раньше минимального срока",
+            text: "Вы продаете квартиру за 7 000 000 ₽, которая была куплена 2 года назад за 6 000 000 ₽ (минимальный владения — 5 лет). Какую сумму выбрать для расчета НДФЛ?",
+            options: [
+                {
+                    label: "Уменьшить доходы на сумму подтвержденных расходов (доход 1 млн ₽)",
+                    hint: "Заплатить НДФЛ 13% с разницы (130 000 ₽)",
+                    badge: "Налог: 130 000 ₽",
+                    badgeStyle: "badge-green",
+                    impact: { balance: -130000, deduction: 0, risk: 0, score: 20 },
+                    feedbackTitle: "Законный и оптимальный расчет!",
+                    feedbackText: "НК РФ позволяет снизить налогооблагаемую базу на величину фактически понесенных и документально подтвержденных расходов на покупку.",
+                    isSuccess: true
+                },
+                {
+                    label: "Занизить стоимость в договоре до 6 000 000 ₽",
+                    hint: "Забрать 1 000 000 ₽ наличными через расписку",
+                    badge: "Высокий риск",
+                    badgeStyle: "badge-red",
+                    impact: { balance: 0, deduction: 0, risk: 55, score: -40 },
+                    feedbackTitle: "Правовое нарушение!",
+                    feedbackText: "Налоговая инспекция автоматически сопоставляет цену сделки с кадастровой стоимостью (не менее 70%). Это приводит к перерасчету, доначислению и штрафам.",
+                    isSuccess: false
+                }
+            ]
+        },
+        {
+            id: 5,
+            badge: "Имущественный вычет",
+            title: "Покупка жилья в ипотеку",
+            text: "Вы приобрели квартиру за 5 000 000 ₽ с привлечением ипотеки. Какую максимальную сумму вычета за покупку (без учета процентов) можно заявтить?",
+            options: [
+                {
+                    label: "260 000 ₽ (13% от установленного лимита 2 000 000 ₽)",
+                    hint: "Плюс в будущем вычет по ипотечным процентам",
+                    badge: "Максимальный вычет",
+                    badgeStyle: "badge-green",
+                    impact: { balance: 0, deduction: 260000, risk: 0, score: 25 },
+                    feedbackTitle: "Абсолютно верно!",
+                    feedbackText: "Законодательный лимит расходов для имущественного вычета при покупке жилья составляет 2 000 000 ₽. Максимальный возврат на руки — 260 000 ₽.",
+                    isSuccess: true
+                },
+                {
+                    label: "650 000 ₽ (13% от полной стоимости 5 000 000 ₽)",
+                    hint: "Расчет без учета предельного лимита",
+                    badge: "Ошибка в лимитах",
+                    badgeStyle: "badge-gold",
+                    impact: { balance: 0, deduction: 260000, risk: 0, score: -10 },
+                    feedbackTitle: "Превышение лимита",
+                    feedbackText: "Закон ограничивает максимальный размер вычета на покупку квартиры суммой в 260 000 ₽. Подать заявку на большее нельзя.",
+                    isSuccess: false
+                }
+            ]
+        }
+    ];
+
+    let currentStep = -1; // -1 = Интро экран
     let state = {
-        coins: 0,
-        currentLabel: "start"
+        balance: 150000,
+        deduction: 0,
+        risk: 0,
+        score: 100
     };
 
-    const story = {
-        // ПРОЛОГ
-        "start": {
-            bg: "images/bg_office.png", speaker: "Валера",
-            text: "Хм, что это ещё за файл? Я такой не сохранял...", sprite: null,
-            next: "prologue_fall"
-        },
-        "prologue_fall": {
-            bg: "images/bg_documents.png", speaker: "Голос сверху",
-            text: "Падать вечно нельзя, дружок. Рано или поздно долетишь до сути.", sprite: null,
-            next: "prologue_cat"
-        },
-        "prologue_cat": {
-            bg: "images/bg_documents.png", speaker: "Рыжий Кот",
-            text: "Добро пожаловать в Страну Налогов, Валера. Тут всё как у вас, только выгоднее — если знать, куда смотреть.", sprite: "images/cat_smile.png",
-            next: "prologue_choice"
-        },
-        "prologue_choice": {
-            speaker: "Выбор", text: "Что спросит Валера?",
-            choices: [
-                { text: "А зачем мне вообще это надо, я и так неплохо живу", next: "prologue_A" },
-                { text: "А можно получить вычет, если я вообще ничего не тратил?", next: "prologue_C" },
-                { text: "Хорошо, показывай дорогу", next: "prologue_B", coins: 10 }
-            ]
-        },
-        "prologue_A": {
-            speaker: "Рыжий Кот", text: "Неплохо — не значит по максимуму. Тысячи рублей просто лежат там, где ты их не забираешь.",
-            next: "prologue_choice"
-        },
-        "prologue_C": {
-            speaker: "Рыжий Кот", text: "Вычет — это возврат уже уплаченного налога с твоих трат. Не потратил — нечего возвращать. Но ты наверняка тратился — на детей, лечение, учёбу...",
-            next: "prologue_choice"
-        },
-        "prologue_B": {
-            bg: "images/bg_road.png", speaker: "Рыжий Кот",
-            text: "Тогда за мной. Первая остановка — Родительский лес.", sprite: "images/cat_full.png",
-            next: "prologue_rule"
-        },
-        "prologue_rule": {
-            bg: "images/bg_road.png", speaker: "Рыжий Кот",
-            text: "Погоди-ка, прежде чем мы пойдём глубже — запомни одну вещь, а то потом собьёшься со счёта. Из каждого рубля твоей зарплаты налоговая забирает 13 копеек. Вычет — это не деньги, которые тебе дарят сверху. Это сумма, с которой налоговая обещает не забирать свои 13 копеек.", sprite: "images/cat_full.png",
-            next: "prologue_rule_caterpillar"
-        },
-        "prologue_rule_caterpillar": {
-            bg: "images/bg_road.png", speaker: "Гусеница Bugatti",
-            text: "Проще говоря: вычет 100 000 ₽ — вернётся 13 000 ₽. Вычет 150 000 ₽ — вернётся 19 500 ₽. Всегда 13% от вычета, а не сам вычет целиком. Получить вычет может только тот, кто платит НДФЛ 13%.", sprite: "images/caterpillar.png",
-            next: "prologue_math"
-        },
-        "prologue_math": {
-            speaker: "Выбор", text: "Валере положен вычет 150 000 ₽ на лечение. Сколько реально вернётся ему на счёт?",
-            choices: [
-                { text: "150 000 ₽", next: "prologue_math_A" },
-                { text: "13 000 ₽", next: "prologue_math_C" },
-                { text: "19 500 ₽", next: "prologue_math_B", coins: 15 }
-            ]
-        },
-        "prologue_math_A": { speaker: "Рыжий Кот", text: "Это база, а не возврат. Пересчитай через 13%.", next: "prologue_math" },
-        "prologue_math_C": { speaker: "Гусеница Bugatti", text: "Это 13% от 100 000, а у нас 150 000.", next: "prologue_math" },
-        "prologue_math_B": {
-            speaker: "Рыжий Кот", text: "Вот теперь считаешь правильно. 150 000 × 13% = 19 500 ₽.",
-            next: "prologue_end"
-        },
-        "prologue_end": {
-            bg: "images/bg_road.png", speaker: "Рыжий Кот",
-            text: "И да — с 2025 года ставка НДФЛ не всегда ровно 13%. При высоком доходе она растёт по прогрессивной шкале, до 22%. Так что у некоторых счастливчиков реальный возврат может быть даже больше стандартных 13% от вычета.", sprite: "images/cat_full.png",
-            next: "block1_start"
-        },
-
-        // БЛОК 1. ЯРМАРКА
-        "block1_start": {
-            bg: "images/bg_fair.png", speaker: "Рыжий Кот",
-            text: "Добро пожаловать на Ярмарку НДФЛ. Это главный налог, который касается тебя каждый месяц, даже если ты о нём не думаешь. Зарплата, премии, доход от сдачи квартиры в аренду, продажа имущества, выигрыши — всё это доход, а с дохода физлица берут НДФЛ.", sprite: "images/cat_full.png",
-            next: "block1_choice1"
-        },
-        "block1_choice1": {
-            speaker: "Выбор", text: "Валера в отпуске выиграл в лотерею 50 000 ₽. Нужно ли платить с этого НДФЛ?",
-            choices: [
-                { text: "Нет, это же не зарплата", next: "block1_ch1_A" },
-                { text: "Только если выигрыш больше 1 000 000 ₽", next: "block1_ch1_C" },
-                { text: "Да, это тоже доход — и с него тоже удерживается налог", next: "block1_ch1_B", coins: 15 }
-            ]
-        },
-        "block1_ch1_A": { speaker: "Рыжий Кот", text: "Прилавок с выигрышами тоже кидает монетку в мешок, не сомневайся.", next: "block1_choice1" },
-        "block1_ch1_C": { speaker: "Гусеница Bugatti", text: "Не совсем так работает порог, дружочек. Выигрыш облагается налогом почти всегда.", next: "block1_choice1" },
-        "block1_ch1_B": {
-            speaker: "Гусеница Bugatti", text: "Именно. Доход есть доход, откуда бы он ни пришёл.",
-            next: "block1_scene2"
-        },
-        "block1_scene2": {
-            bg: "images/bg_booth.png", speaker: "Рыжий Кот",
-            text: "Видишь эту будку? Это твой работодатель — он тут называется налоговым агентом. С зарплаты всё происходит автоматически. А вот с другими доходами — не так. Придётся подавать декларацию 3-НДФЛ самостоятельно.", sprite: "images/cat_full.png",
-            next: "block1_choice2"
-        },
-        "block1_choice2": {
-            speaker: "Выбор", text: "Валера сдаёт квартиру в аренду, деньги приходят напрямую ему на карту. Что делать с налогом?",
-            choices: [
-                { text: "Ничего, раз с зарплаты уже всё удержали", next: "block1_ch2_A" },
-                { text: "Попросить своего работодателя удержать и с этого дохода тоже", next: "block1_ch2_C" },
-                { text: "Самому подать декларацию 3-НДФЛ по итогам года и заплатить налог", next: "block1_ch2_B", coins: 15 }
-            ]
-        },
-        "block1_ch2_A": { speaker: "Рыжий Кот", text: "Зарплата и аренда — два разных источника дохода, будка тут ни при чём.", next: "block1_choice2" },
-        "block1_ch2_C": { speaker: "Гусеница Bugatti", text: "Работодатель отвечает только за то, что платит сам, дружочек.", next: "block1_choice2" },
-        "block1_ch2_B": { speaker: "Рыжий Кот", text: "Именно так — без декларации в этом случае никак.", next: "block1_scene3" },
+    function updateDashboard() {
+        document.getElementById('metric-balance').innerText = state.balance.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('metric-deduction').innerText = state.deduction.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('metric-risk').innerText = state.risk + '%';
+        document.getElementById('metric-score').innerText = state.score + ' / 100';
         
-        "block1_scene3": {
-            bg: "images/bg_stairs.png", speaker: "Гусеница Bugatti",
-            text: "С 2025 года у нас не одна ставка НДФЛ, а целая лестница — пять ступеней: до 2,4 млн — 13%, от 2,4 до 5 млн — 15% с превышения, от 5 до 20 млн — 18% с превышения, от 20 до 50 млн — 20% с превышения, свыше 50 млн — 22% с превышения.", sprite: "images/caterpillar.png",
-            next: "block1_choice3"
-        },
-        "block1_choice3": {
-            speaker: "Выбор", text: "Доход Валеры за год — 3 000 000 ₽. Как считается его НДФЛ?",
-            choices: [
-                { text: "15% на всю сумму сразу", next: "block1_ch3_A" },
-                { text: "13% на всё, раз доход меньше 5 000 000 ₽", next: "block1_ch3_C" },
-                { text: "13% на первые 2 400 000 ₽ и 15% на оставшиеся 600 000 ₽", next: "block1_ch3_B", coins: 20 }
-            ]
-        },
-        "block1_ch3_A": { speaker: "Рыжий Кот", text: "Лестница ступенчатая — с этой ступеньки платят не все сразу, а только та часть, что до неё дотянулась.", next: "block1_choice3" },
-        "block1_ch3_C": { speaker: "Гусеница Bugatti", text: "Порог для 13% — это 2 400 000, а не 5 000 000, дружочек.", next: "block1_choice3" },
-        "block1_ch3_B": { speaker: "Гусеница Bugatti", text: "Точно! 2 400 000 × 13% + 600 000 × 15% = 312 000 + 90 000 = 402 000 ₽ налога.", next: "block1_scene4" },
-
-        "block1_scene4": {
-            bg: "images/bg_cabinet.png", speaker: "Рыжий Кот",
-            text: "Запомни этот павильон — сюда мы будем возвращаться в каждой следующей главе. Все заявления и справки приходят именно туда, на сайт ФНС России. А ещё все правила действуют для налоговых резидентов РФ, которые провели в России больше 183 дней за последние 12 месяцев.", sprite: "images/cat_full.png",
-            next: "block2_start"
-        },
-
-        // БЛОК 2. НЕДВИЖИМОСТЬ
-        "block2_start": {
-            bg: "images/bg_realty.png", speaker: "Рыжий Кот",
-            text: "Здесь живут те, кто купил своё жильё. И тут государству тоже есть что тебе вернуть.", sprite: "images/cat_full.png",
-            next: "block2_scene1"
-        },
-        "block2_scene1": {
-            bg: "images/bg_realty.png", speaker: "Гусеница Bugatti",
-            text: "На два отдельных вычета сразу! Первый — за саму покупку: база 2 000 000 ₽, максимальный возврат 260 000 ₽. Второй — за уплаченные проценты по ипотеке: база уже 3 000 000 ₽, максимальный возврат 390 000 ₽. А если вы в браке — оба супруга могут заявить вычет.", sprite: "images/caterpillar.png",
-            next: "block2_choice1"
-        },
-        "block2_choice1": {
-            speaker: "Выбор", text: "Валера и его жена купили квартиру в ипотеку за 6 000 000 ₽. Как выгоднее оформить вычет?",
-            choices: [
-                { text: "Вычет заявляет только Валера один", next: "block2_ch1_A" },
-                { text: "Вычет не положен, раз квартира дороже 2 000 000 ₽", next: "block2_ch1_C" },
-                { text: "Вычет заявляют оба супруга — так семейный лимит по процентам увеличивается", next: "block2_ch1_B", coins: 20 }
-            ]
-        },
-        "block2_ch1_A": { speaker: "Рыжий Кот", text: "Можно и так, но тогда вторая половина лимита просто сгорит зря.", next: "block2_choice1" },
-        "block2_ch1_C": { speaker: "Гусеница Bugatti", text: "Лимит — это потолок для расчёта, а не запрет на вычет при более дорогой покупке.", next: "block2_choice1" },
-        "block2_ch1_B": { speaker: "Гусеница Bugatti", text: "Именно! Вдвоём вы используете куда больше положенного лимита, чем поодиночке.", next: "block2_scene2" },
-
-        "block2_scene2": {
-            bg: "images/bg_garage.png", speaker: "Рыжий Кот",
-            text: "А вот тут — наоборот, о продаже. Здесь важно не прогадать со временем. Для недвижимости минимальный срок владения — 5 лет, для машины — 3 года. А налог можно уменьшить вычетом: 1 000 000 ₽ для недвижимости, 250 000 ₽ для прочего имущества.", sprite: "images/cat_full.png",
-            next: "block2_choice2"
-        },
-        "block2_choice2": {
-            speaker: "Выбор", text: "У Валеры квартира не единственная, он владеет ей 4 года и хочет продать. Нужно ли платить налог?",
-            choices: [
-                { text: "Нет, 4 года — вполне достаточно", next: "block2_ch2_A" },
-                { text: "Срок владения тут вообще не имеет значения", next: "block2_ch2_C" },
-                { text: "Да, минимальный срок — 5 лет, значит налог платить придётся", next: "block2_ch2_B", coins: 20 }
-            ]
-        },
-        "block2_ch2_A": { speaker: "Рыжий Кот", text: "Пять лет — это пять лет, дружок.", next: "block2_choice2" },
-        "block2_ch2_C": { speaker: "Рыжий Кот", text: "Пять лет — это пять лет, дружок.", next: "block2_choice2" },
-        "block2_ch2_B": { speaker: "Гусеница Bugatti", text: "Всё верно. Раньше пяти лет для не единственного жилья — налог с разницы между продажей и вычетом или расходами на покупку.", next: "block2_scene3" },
-        
-        "block2_scene3": {
-            bg: "images/bg_garage.png", speaker: "Гусеница Bugatti",
-            text: "И ещё одно, прежде чем идти дальше. Помнишь лестницу из пяти ступеней? С 2025 года ставка НДФЛ не всегда ровно 13% — у тех, кто зарабатывает существенно больше, часть дохода облагается уже по 15–22%. Так что если коллега говорит, что вернул больше 13% — не спеши считать его хвастуном.", sprite: "images/caterpillar.png",
-            next: "block4_start" // Переход к Блоку 4, так как Блок 3 в разработке
-        },
-
-        // БЛОК 4. СОЦИАЛЬНЫЕ БОНУСЫ
-        "block4_start": {
-            bg: "images/bg_forest.png", speaker: "Рыжий Кот",
-            text: "У тебя есть дети, Валера? Тогда этот лес шумит для тебя. Каждый месяц, пока твой доход с начала года не перевалит за 450 000 рублей, тебе полагается вычет на каждого.", sprite: "images/cat_smile.png",
-            next: "block4_scene1"
-        },
-        "block4_scene1": {
-            bg: "images/bg_forest.png", speaker: "Гусеница Bugatti",
-            text: "Ах, молодой человек... До 2025 года на второго ребёнка давали всего 1400 рублей в месяц. Теперь — 2800. На третьего и последующих было 3000, стало 6000. На первую — 1400, на второго — 2800. Итого 4200 рублей вычета.", sprite: "images/caterpillar.png",
-            next: "block4_choice1"
-        },
-        "block4_choice1": {
-            speaker: "Выбор", text: "Как Валере получить этот вычет?",
-            choices: [
-                { text: "Пойти в налоговую и подать декларацию 3-НДФЛ", next: "block4_ch1_A" },
-                { text: "Ждать, пока налоговая сама пришлёт вычет", next: "block4_ch1_C" },
-                { text: "Обратиться в бухгалтерию/отдел кадров на работе", next: "block4_ch1_B", coins: 20 }
-            ]
-        },
-        "block4_ch1_A": { speaker: "Рыжий Кот", text: "Можно и так, но зачем усложнять? Есть путь короче.", next: "block4_choice1" },
-        "block4_ch1_C": { speaker: "Рыжий Кот", text: "Этот вычет сам себя не найдёт — его получают через работодателя, а не ждут у моря погоды.", next: "block4_choice1" },
-        "block4_ch1_B": { speaker: "Гусеница Bugatti", text: "Именно так. Принеси в бухгалтерию копию свидетельства о рождении, для дочери — справку из вуза об очной форме, и заявление. Дальше зарплата сама станет немного больше.", next: "block4_scene2" },
-
-        "block4_scene2": {
-            bg: "images/bg_gto.png", speaker: "Рыжий Кот",
-            text: "А вот и моё любимое нововведение. С 2025 года государство платит тебе за заботу о себе. Сдай нормы ГТО, получи знак отличия — и пройди диспансеризацию в том же году. Вот тогда вычет твой. 18 000 рублей в год.", sprite: "images/cat_full.png",
-            next: "block4_choice2"
-        },
-        "block4_choice2": {
-            speaker: "Выбор", text: "Валера в этом году сдал ГТО в марте, а диспансеризацию прошёл в декабре прошлого года. Получит он вычет?",
-            choices: [
-                { text: "Да, оба события были", next: "block4_ch2_A" },
-                { text: "Да, если попросит по-хорошему", next: "block4_ch2_C" },
-                { text: "Нет, годы должны совпадать", next: "block4_ch2_B", coins: 20 }
-            ]
-        },
-        "block4_ch2_A": { speaker: "Гусеница Bugatti", text: "Увы. Правило простое — оба события в одном календарном году.", next: "block4_choice2" },
-        "block4_ch2_C": { speaker: "Гусеница Bugatti", text: "Увы. Правило простое — оба события в одном календарном году.", next: "block4_choice2" },
-        "block4_ch2_B": { speaker: "Рыжий Кот", text: "Соображаешь. Получить этот вычет можно у работодателя, единовременно, в любом месяце — просто принеси документы.", next: "block4_scene3" },
-
-        "block4_scene3": {
-            bg: "images/bg_social_forest.png", speaker: "Рыжий Кот",
-            text: "Здесь всё, на что ты обычно тратишься сам. Учёба, лечение, фитнес — общий лимит вычета 150 000 рублей в год. А вот обучение детей считается отдельно — до 110 000 рублей на каждого ребёнка. Дорогостоящее лечение вообще не ограничено лимитом.", sprite: "images/cat_full.png",
-            next: "block4_choice3"
-        },
-        "block4_choice3": {
-            speaker: "Выбор", text: "Валера потратил: 40 000 ₽ на обучение, 90 000 ₽ на фитнес, и 80 000 ₽ на обучение сына. Сколько войдёт в общий лимит?",
-            choices: [
-                { text: "Все 210 000 войдут в общий лимит", next: "block4_ch3_A" },
-                { text: "Всё войдёт в лимит на ребёнка", next: "block4_ch3_C" },
-                { text: "130 000 — в общий лимит, а 80 000 за сына — отдельно", next: "block4_ch3_B", coins: 30 }
-            ]
-        },
-        "block4_ch3_A": { speaker: "Рыжий Кот", text: "Не совсем. Обучение и лечение за себя — это один котёл, а за детей — отдельный.", next: "block4_choice3" },
-        "block4_ch3_C": { speaker: "Рыжий Кот", text: "Не совсем. Обучение и лечение за себя — это один котёл, а за детей — отдельный.", next: "block4_choice3" },
-        "block4_ch3_B": { speaker: "Гусеница Bugatti", text: "Прекрасно! Именно так — траты Валеры на себя (130 000) укладываются в общий лимит 150 000, а 80 000 за сына — отдельно.", next: "block4_scene4" },
-
-        "block4_scene4": {
-            bg: "images/bg_archive.png", speaker: "Рыжий Кот",
-            text: "Раньше здесь был хаос — договоры, чеки, лицензии для каждого вычета отдельно. Теперь порядок: одна справка на всё. Но это только для трат после 1 января 2024 года.", sprite: "images/cat_full.png",
-            next: "block4_choice4"
-        },
-        "block4_choice4": {
-            speaker: "Выбор", text: "Что нужно сделать, чтобы получить вычет в упрощённом порядке?",
-            choices: [
-                { text: "Собрать справки, чеки и лично отнести их в налоговую", next: "block4_ch4_A" },
-                { text: "Ничего, вычет придёт сам собой без всяких действий", next: "block4_ch4_C" },
-                { text: "Дождаться предзаполненного заявления в Личном кабинете и просто подписать его", next: "block4_ch4_B", coins: 25 }
-            ]
-        },
-        "block4_ch4_A": { speaker: "Рыжий Кот", text: "Это как раз то, от чего мы избавились. Не в этот раз.", next: "block4_choice4" },
-        "block4_ch4_C": { speaker: "Гусеница Bugatti", text: "Подписать заявление всё же придётся — само оно не подтвердится.", next: "block4_choice4" },
-        "block4_ch4_B": { speaker: "Рыжий Кот", text: "Организация сама передаст данные — с твоего согласия. В марте следующего года жди сообщение в Личном кабинете.", next: "block4_scene5" },
-
-        "block4_scene5": {
-            bg: "images/bg_palace.png", speaker: "Рыжий Кот",
-            text: "Добро пожаловать в самое новое крыло Страны Налогов. С 2026 года здесь раздают кешбэк. Если в семье двое и более детей, и средний доход на человека ниже 1,5 прожиточного минимума — налог пересчитывается по ставке 6% вместо 13%.", sprite: "images/cat_full.png",
-            next: "block4_choice5"
-        },
-        "block4_choice5": {
-            speaker: "Выбор", text: "У Гены трое детей, доход 1 450 000 ₽, прожиточный минимум 17 733 ₽. Подходит ли Гена под кешбэк?",
-            choices: [
-                { text: "Не подходит, доход слишком большой", next: "block4_ch5_A" },
-                { text: "Невозможно посчитать без дополнительных данных", next: "block4_ch5_C" },
-                { text: "Подходит, доход ниже порога", next: "block4_ch5_B", coins: 30 }
-            ]
-        },
-        "block4_ch5_A": { speaker: "Рыжий Кот", text: "Кот качает головой, показывает лапой на цифры выше.", next: "block4_choice5" },
-        "block4_ch5_C": { speaker: "Рыжий Кот", text: "Кот качает головой, показывает лапой на цифры выше.", next: "block4_choice5" },
-        "block4_ch5_B": { speaker: "Гусеница Bugatti", text: "Верно! И сумма кешбэка — это разница между налогом по 13% и по 6% — то есть 101 500 ₽ в год!", next: "final" },
-
-        // ФИНАЛ
-        "final": {
-            bg: "images/bg_final.png", speaker: "Рыжий Кот",
-            text: "Ну что, Валера, готов открыть сундук? Помни: вычет сам не придёт, если ты сам не протянешь руку. Увидимся в другой раз!", sprite: "images/cat_smile.png",
-            next: "end_game"
-        },
-        "end_game": {
-            speaker: "Система", text: "Конец игры! Вы собрали " + state.coins + " монет любопытства. Спасибо за игру!",
-            next: null
-        }
-    };
-
-    // ==========================================
-    // ЛОГИКА ИГРЫ (JS)
-    // ==========================================
-    const bgElement = document.getElementById('game-container');
-    const speakerElement = document.getElementById('speaker');
-    const textElement = document.getElementById('text');
-    const spriteElement = document.getElementById('character-sprite');
-    const choicesElement = document.getElementById('choices');
-    const dialogueBox = document.getElementById('dialogue-box');
-    const coinDisplay = document.getElementById('coins-display');
-    const coinCount = document.getElementById('coin-count');
-
-    function updateScene() {
-        const scene = story[state.currentLabel];
-        if (!scene) {
-            console.error("Сцена не найдена: " + state.currentLabel);
-            return;
-        }
-
-        // Обновляем монеты
-        coinCount.innerText = state.coins;
-        if (state.coins > 0) coinDisplay.style.display = 'block';
-
-        // Если это слайд с выбором
-        if (scene.choices) {
-            dialogueBox.style.display = 'none';
-            choicesElement.style.display = 'flex';
-            choicesElement.innerHTML = '';
-            
-            scene.choices.forEach(choice => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.innerText = choice.text;
-                btn.onclick = () => {
-                    if (choice.coins) state.coins += choice.coins;
-                    state.currentLabel = choice.next;
-                    choicesElement.style.display = 'none';
-                    dialogueBox.style.display = 'flex';
-                    updateScene();
-                };
-                choicesElement.appendChild(btn);
-            });
-            return;
-        }
-
-        // Обычный слайд
-        dialogueBox.style.display = 'flex';
-        
-        // Меняем фон
-        if (scene.bg) {
-            bgElement.style.backgroundImage = `url('${scene.bg}')`;
-        }
-        
-        // Меняем текст и говорящего
-        speakerElement.innerText = scene.speaker || "Система";
-        textElement.innerText = scene.text || "";
-        
-        // Показываем/скрываем спрайт
-        if (scene.sprite) {
-            spriteElement.src = scene.sprite;
-            spriteElement.style.display = 'block';
+        if (currentStep === -1) {
+            document.getElementById('step-counter').innerText = 'Вводный курс';
+        } else if (currentStep < scenarios.length) {
+            document.getElementById('step-counter').innerText = `Ситуация ${currentStep + 1} из ${scenarios.length}`;
         } else {
-            spriteElement.style.display = 'none';
+            document.getElementById('step-counter').innerText = 'Завершено';
         }
     }
 
-    function nextSlide() {
-        const scene = story[state.currentLabel];
-        if (scene.choices || !scene.next) return; // Если выбор или конец игры
+    function renderIntro() {
+        const screen = document.getElementById('game-screen');
+        screen.innerHTML = `
+            <div class="intro-container">
+                <div class="intro-badge">Финансовая грамотность • 2026</div>
+                <h1 class="intro-title">Как работать с налоговой системой и вычетами в РФ</h1>
+                <p class="intro-text">
+                    Каждый официально работающий гражданин России уплачивает <strong>НДФЛ (Налог на доходы физических лиц)</strong>. 
+                    Налоговые вычеты — это законный инструмент, позволяющий уменьшить сумму налога или вернуть часть ранее уплаченных средств из бюджета обратно на ваш счет.
+                </p>
 
-        state.currentLabel = scene.next;
-        updateScene();
+                <div class="info-cards-grid">
+                    <div class="info-card">
+                        <div class="info-card-title">💡 Что такое Налоговый Вычет?</div>
+                        <div class="info-card-desc">Это сумма, которая уменьшает налогооблагаемую базу. Вы можете вернуть 13% от потраченных средств на лечение, обучение, спорт, покупку квартиры или инвестиции.</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-title">⚖️ Прогрессивная шкала НДФЛ</div>
+                        <div class="info-card-desc">В зависимости от уровня годового дохода ставка НДФЛ составляет от 13% до 22%. Грамотное планирование вычетов позволяет существенно сберечь личный бюджет.</div>
+                    </div>
+                </div>
+
+                <p class="intro-text" style="font-size: 14px; margin-bottom: 28px;">
+                    Вам предстоит пройти 5 реальных жизненных сценариев. Ваша цель — принимать финансово и юридически грамотные решения, накапливать вычеты и минимизировать риски штрафов.
+                </p>
+
+                <button class="btn-primary" onclick="startGame()">Начать симуляцию</button>
+            </div>
+        `;
+        updateDashboard();
     }
 
-    // Запуск игры
-    updateScene();
+    function startGame() {
+        currentStep = 0;
+        renderScenario();
+    }
+
+    function renderScenario() {
+        if (currentStep >= scenarios.length) {
+            renderFinalResults();
+            return;
+        }
+
+        const data = scenarios[currentStep];
+        const screen = document.getElementById('game-screen');
+
+        screen.innerHTML = `
+            <div class="scenario-container">
+                <div class="scenario-badge">📌 ${data.badge}</div>
+                <h2 class="scenario-title">${data.title}</h2>
+                <p class="scenario-text">${data.text}</p>
+                
+                <div class="options-grid">
+                    ${data.options.map((opt, idx) => `
+                        <div class="option-card" onclick="selectOption(${idx})">
+                            <div class="option-content">
+                                <div class="option-label">${opt.label}</div>
+                                <div class="option-hint">${opt.hint}</div>
+                            </div>
+                            <div class="option-badge ${opt.badgeStyle}">${opt.badge}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        updateDashboard();
+    }
+
+    function selectOption(optionIndex) {
+        const scenario = scenarios[currentStep];
+        const selected = scenario.options[optionIndex];
+
+        state.balance += selected.impact.balance;
+        state.deduction += selected.impact.deduction;
+        state.risk = Math.min(100, Math.max(0, state.risk + selected.impact.risk));
+        state.score = Math.max(0, state.score + selected.impact.score);
+
+        const modal = document.getElementById('modal');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const modalChanges = document.getElementById('modal-changes');
+
+        modalIcon.className = `feedback-status-icon ${selected.isSuccess ? 'status-success' : 'status-warning'}`;
+        modalIcon.innerText = selected.isSuccess ? '✓' : '!';
+        modalTitle.innerText = selected.feedbackTitle;
+        modalText.innerText = selected.feedbackText;
+
+        modalChanges.innerHTML = `
+            <div class="change-item"><span>Баллы грамотности:</span> <strong>${selected.impact.score >= 0 ? '+' : ''}${selected.impact.score} б.</strong></div>
+            ${selected.impact.deduction ? `<div class="change-item"><span>Налоговый вычет:</span> <strong>+${selected.impact.deduction.toLocaleString('ru-RU')} ₽</strong></div>` : ''}
+            ${selected.impact.risk ? `<div class="change-item"><span>Изменение риска:</span> <strong>+${selected.impact.risk}%</strong></div>` : ''}
+        `;
+
+        modal.classList.add('active');
+    }
+
+    function nextQuestion() {
+        document.getElementById('modal').classList.remove('active');
+        currentStep++;
+        renderScenario();
+    }
+
+    function renderFinalResults() {
+        const screen = document.getElementById('game-screen');
+        updateDashboard();
+
+        let statusText = "";
+        if (state.score >= 140) {
+            statusText = "Вы продемонстрировали высокий уровень налоговой грамотности. Вы эффективно используете преференции законодательства РФ и защищены от рисков.";
+        } else if (state.score >= 90) {
+            statusText = "Хороший результат. Вы понимаете ключевые правила, но упускаете некоторые законные возможности для налоговой оптимизации.";
+        } else {
+            statusText = "Уровень риска превышает безопасную норму. Рекомендуется глубже изучить статьи Налогового кодекса РФ, чтобы избежать штрафных санкций.";
+        }
+
+        screen.innerHTML = `
+            <div class="results-container">
+                <div class="scenario-badge">Итоги симулятора</div>
+                <h2 class="scenario-title">Финансовый год завершен</h2>
+                
+                <div class="results-score">${state.score} / 190</div>
+                <p class="scenario-text" style="margin: 0 auto 28px auto;">${statusText}</p>
+
+                <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; text-align: left;">
+                    <div style="background: var(--card-subtle); padding: 20px; border-radius: 16px; border:1px solid var(--border-color); flex:1;">
+                        <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Итого вычетов:</div>
+                        <div style="font-size:20px; font-weight:700; color:var(--accent-brand); margin-top:4px;">${state.deduction.toLocaleString('ru-RU')} ₽</div>
+                    </div>
+                    <div style="background: var(--card-subtle); padding: 20px; border-radius: 16px; border:1px solid var(--border-color); flex:1;">
+                        <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">Уровень риска:</div>
+                        <div style="font-size:20px; font-weight:700; color:${state.risk > 30 ? 'var(--accent-red)' : 'var(--accent-green)'}; margin-top:4px;">${state.risk}%</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="restartGame()">Пройти симуляцию заново</button>
+            </div>
+        `;
+    }
+
+    function restartGame() {
+        currentStep = -1;
+        state = { balance: 150000, deduction: 0, risk: 0, score: 100 };
+        renderIntro();
+    }
+
+    // Инициализация при загрузке
+    renderIntro();
 </script>
 
 </body>
 </html>
-```
